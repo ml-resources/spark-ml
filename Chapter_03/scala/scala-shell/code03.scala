@@ -15,12 +15,6 @@ val num_zipcodes = user_fields.map(l => l(4)).distinct().count()
 
 //Movies Dataset
 
-/*
-movie_data = sc.textFile("%s/ml-100k/u.item" % PATH)
-print movie_data.first()
-num_movies = movie_data.count()
-print "Movies: %d" % num_movies
- */
 
 var movie_data = sc.textFile("../../data/ml-100k/u.item")
 println(movie_data.first())

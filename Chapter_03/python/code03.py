@@ -90,17 +90,6 @@ years = movie_fields.map(lambda fields: fields[2]).map(lambda x: convert_year(x)
 years_filtered = years.filter(lambda x: x != 1900)
 # plot the movie ages histogram
 movie_ages = years_filtered.map(lambda yr: 1998-yr).countByValue()
-print movie_ages
-#defaultdict(<type 'int'>, {0: 65, 1: 286, 2: 355, 3:
-# 219, 4: 214, 5: 126, 6: 37, 7: 22, 8: 24, 9: 15, 10: 11,
-# 11: 13, 12: 15, 13: 7, 14: 8, 15: 5, 16: 13, 17: 12, 18: 8, 19: 9, 20: 4,
-# 21: 4, 22: 5, 23: 6, 24: 8, 25: 4, 26: 3, 27: 7, 28: 3, 29: 4, 30: 6, 31: 5,
-# 32: 2, 33: 5, 34: 2, 35: 6, 36: 5, 37: 3, 38: 5, 39: 4, 40: 9, 41: 8, 42: 4,
-# 43: 5, 44: 7, 45: 2, 46: 3, 47: 5, 48: 7, 49: 4, 50: 3, 51: 5, 52: 5, 53: 4,
-# 54: 5, 55: 4, 56: 2, 57: 5, 58: 8, 59: 7, 60: 3, 61: 4, 62: 2, 63: 4, 64: 4,
-# 65: 2, 66: 1, 67: 1, 68: 1, 72: 1, 76: 1})
-
-
 values = movie_ages.values()
 bins = movie_ages.keys()
 hist(values, bins=bins, color='lightblue', normed=True)

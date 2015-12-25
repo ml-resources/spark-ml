@@ -1,10 +1,14 @@
-var user_data = sc.textFile("../../data/ml-100k/u.user")
 
+/*******************/
+/* User Dataset  */
+/*******************/
+var user_data = sc.textFile("../../data/ml-100k/u.user")
 println(user_data.first())
-user_data = user_data.map(l => l.replaceAll("[|]", ","))
+
+
 //  1|24|M|technician|85711
 
-val user_fields = user_data.map(l => l.split(","))
+val user_fields = user_data.map(l => l.split("\\|"))
 
 val num_users = user_fields.map(l => l(0)).count()
 
@@ -13,13 +17,37 @@ val num_genders = user_fields.map(l => l(2)).distinct().count()
 val num_occupations = user_fields.map(l => l(3)).distinct().count()
 val num_zipcodes = user_fields.map(l => l(4)).distinct().count()
 
-//Movies Dataset
+val ages = user_fields.map( x => (x(1).toInt)).collect()
+
+val count_by_occupation = user_fields.map( fields => (fields(3), 1)).reduceByKey( (x, y) => x + y).collect()
+
+/*
+ * count_by_occupation: Array[(String, Int)] = Array((marketing,26), (librarian,51), (technician,27), (scientist,31),
+ *(none,9), (executive,32), (other,105), (programmer,66), (lawyer,12), (entertainment,18), (salesman,12), (retired,14),
+ * (healthcare,16), (administrator,79), (student,196), (doctor,7), (writer,45), (engineer,67), (homemaker,7),
+ *(educator,95), (artist,28))
+ */
+
+val count_by_occupation2 = user_fields.map( fields =>  fields(3)).countByValue()
+
+/*
+count_by_occupation2: scala.collection.Map[String,Long] = Map(scientist -> 31, student -> 196, writer -> 45,
+salesman -> 12, retired -> 14, administrator -> 79, programmer -> 66, doctor -> 7, homemaker -> 7, executive -> 32,
+engineer -> 67, entertainment -> 18, marketing -> 26, technician -> 27, artist -> 28, librarian -> 51, lawyer -> 12, e
+ducator -> 95, healthcare -> 16, none -> 9, other -> 105)
+ */
+
+/*******************/
+/* Movies Dataset  */
+/*******************/
 
 
 var movie_data = sc.textFile("../../data/ml-100k/u.item")
 println(movie_data.first())
-movie_data = movie_data.map(l => l.replaceAll("[|]", ","))
+
 val num_movies = movie_data.count()
+
+
 
 /*
 python code
@@ -41,7 +69,7 @@ def convertYear( x:String) : Int = {
   }
 }
 
-val movie_fields = movie_data.map(lines =>  lines.split("$"))
+val movie_fields = movie_data.map(lines =>  lines.split("\\|"))
 val years = movie_fields.map( field => field(2)).map( x => convertYear(x))
 
 val years_filtered = years.filter(x => (x != 1900) )

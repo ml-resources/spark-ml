@@ -363,3 +363,4 @@ print "2-Norm of x: %2.4f" % norm_x_2
 print "Normalized x MLlib:\n%s" % normalized_x_mllib
 print "2-Norm of normalized_x_mllib: %2.4f" % np.linalg.norm(normalized_x_mllib)
 
+

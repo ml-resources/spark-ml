@@ -32,5 +32,7 @@ nameRDD = collect(nameRDD)
 head(nameRDD)
 
 #uniqueUsers <- distinct(nameRDD)
-first(uniqueUsers)
+uniqueUsers <- unique(nameRDD)
+head(uniqueUsers)
+#first(uniqueUsers)
 

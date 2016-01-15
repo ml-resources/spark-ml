@@ -13,26 +13,35 @@ count(data)
 
 parseFields <- function(record) {
   Sys.setlocale("LC_ALL", "C") # necessary for strsplit() to work correctly
-  parts <- strsplit(as.character(record), ",")[[1]]
+  parts <- strsplit(as.character(record), ",")
   list(name=parts[1], product=parts[2], price=parts[3])
 }
-
 
 parsedRDD <- SparkR:::lapply(data, parseFields)
 cache(parsedRDD)
 numPurchases <- count(parsedRDD)
+
 sprintf("Number of Purchases : %d", numPurchases)
 getName <- function(record){
   record[1]
 }
 
-#nameRDD <- SparkR:::lapply(parsedRDD, function(x) { x$name })
+
 nameRDD <- SparkR:::lapply(parsedRDD, getName)
 nameRDD = collect(nameRDD)
 head(nameRDD)
 
-#uniqueUsers <- distinct(nameRDD)
 uniqueUsers <- unique(nameRDD)
 head(uniqueUsers)
-#first(uniqueUsers)
+
+prices <- SparkR:::lapply(parsedRDD, function(x) { x$price })
+take(prices, 5)
+
+prices <- SparkR:::lapply(prices, function(x) { list(1, as.numeric(x)) })
+take(prices1, 5)
+totalRevenue <- SparkR:::reduceByKey(prices1, "+", 1L)
+take(totalRevenue,1)
+
+
+
 

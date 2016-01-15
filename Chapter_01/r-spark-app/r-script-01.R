@@ -1,4 +1,4 @@
-Sys.setenv(SPARK_HOME = "/Users/manpreet.singh/Downloads/spark-1.6.0-bin-hadoop2.6")
+Sys.setenv(SPARK_HOME = "/home/ubuntu/work/spark-1.5.2-bin-hadoop2.6")
 .libPaths(c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib"), .libPaths()))
 
 #load the Sparkr library
@@ -6,14 +6,14 @@ library(SparkR)
 sc <- sparkR.init(master = "local", sparkPackages="com.databricks:spark-csv_2.10:1.3.0")
 sqlContext <- sparkRSQL.init(sc)
 
-user.purchase.history <- "/Users/manpreet.singh/Sandbox/codehub/github/spark-ml/Chapter_01/r-spark-app/data/UserPurchaseHistory.csv"
+user.purchase.history <- "/home/ubuntu/work/rajdeepd-spark-ml/spark-ml/Chapter_01/r-spark-app/data/UserPurchaseHistory.csv"
 data <- read.df(sqlContext, user.purchase.history, "com.databricks.spark.csv", header="false")
 head(data)
 count(data)
 
 parseFields <- function(record) {
   Sys.setlocale("LC_ALL", "C") # necessary for strsplit() to work correctly
-  parts <- strsplit(as.character(record), ",")[[1]]
+  parts <- strsplit(as.character(record), ",")
   list(name=parts[1], product=parts[2], price=parts[3])
 }
 
@@ -21,18 +21,27 @@ parseFields <- function(record) {
 parsedRDD <- SparkR:::lapply(data, parseFields)
 cache(parsedRDD)
 numPurchases <- count(parsedRDD)
+
 sprintf("Number of Purchases : %d", numPurchases)
 getName <- function(record){
   record[1]
 }
 
-#nameRDD <- SparkR:::lapply(parsedRDD, function(x) { x$name })
+
 nameRDD <- SparkR:::lapply(parsedRDD, getName)
 nameRDD = collect(nameRDD)
 head(nameRDD)
 
-#uniqueUsers <- distinct(nameRDD)
 uniqueUsers <- unique(nameRDD)
-head(uniqueUsers)
-#first(uniqueUsers)
+
+prices <- SparkR:::lapply(parsedRDD, function(x) { x$price })
+take(prices, 5)
+
+prices <- SparkR:::lapply(prices, function(x) { list(1, as.numeric(x)) })
+take(prices1, 5)
+totalRevenue <- SparkR:::reduceByKey(prices1, "+", 1L)
+take(totalRevenue,1)
+
+
+
 

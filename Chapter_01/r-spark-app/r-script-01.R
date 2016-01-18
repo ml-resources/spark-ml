@@ -33,9 +33,6 @@ head(nameRDD)
 uniqueUsers <- unique(nameRDD)
 head(uniqueUsers)
 
-prices <- SparkR:::lapply(parsedRDD, function(x) { x$price })
-take(prices, 5)
-
 prices <- SparkR:::lapply(prices, function(x) { list(1, as.numeric(x)) })
 take(prices, 5)
 totalRevenue <- SparkR:::reduceByKey(prices, "+", 1L)

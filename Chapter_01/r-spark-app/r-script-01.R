@@ -1,4 +1,4 @@
-Sys.setenv(SPARK_HOME = "/Users/manpreet.singh/Downloads/spark-1.6.0-bin-hadoop2.6")
+Sys.setenv(SPARK_HOME = "/PATH/spark-1.6.0-bin-hadoop2.6")
 .libPaths(c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib"), .libPaths()))
 
 #load the Sparkr library
@@ -6,7 +6,7 @@ library(SparkR)
 sc <- sparkR.init(master = "local", sparkPackages="com.databricks:spark-csv_2.10:1.3.0")
 sqlContext <- sparkRSQL.init(sc)
 
-user.purchase.history <- "/Users/manpreet.singh/Sandbox/codehub/github/spark-ml/Chapter_01/r-spark-app/data/UserPurchaseHistory.csv"
+user.purchase.history <- "/PATH/spark-ml/Chapter_01/r-spark-app/data/UserPurchaseHistory.csv"
 data <- read.df(sqlContext, user.purchase.history, "com.databricks.spark.csv", header="false")
 head(data)
 count(data)
@@ -26,7 +26,6 @@ getName <- function(record){
   record[1]
 }
 
-
 nameRDD <- SparkR:::lapply(parsedRDD, getName)
 nameRDD = collect(nameRDD)
 head(nameRDD)
@@ -34,14 +33,17 @@ head(nameRDD)
 uniqueUsers <- unique(nameRDD)
 head(uniqueUsers)
 
-prices <- SparkR:::lapply(parsedRDD, function(x) { x$price })
-take(prices, 5)
-
 prices <- SparkR:::lapply(prices, function(x) { list(1, as.numeric(x)) })
-take(prices1, 5)
-totalRevenue <- SparkR:::reduceByKey(prices1, "+", 1L)
-take(totalRevenue,1)
+take(prices, 5)
+totalRevenue <- SparkR:::reduceByKey(prices, "+", 1L)
+totalRevenueNum <- first(totalRevenue)[2][1]
+sprintf("Total Revenue : %.2f", totalRevenueNum)
 
+products <- SparkR:::lapply(parsedRDD, function(x) { list( toString(x$product[1]), 1) })
+take(products, 5)
+productCount <- SparkR:::reduceByKey(products, "+", 2L)
+productsCountAsKey <- SparkR:::lapply(productCount, function(x) { list( as.integer(x[2][1]), x[1][1])})
 
-
-
+productCount <- count(productsCountAsKey)
+mostPopular <- toString(collect(productsCountAsKey)[[productCount]][[2]])
+sprintf("Most Popular Product : %s", mostPopular)

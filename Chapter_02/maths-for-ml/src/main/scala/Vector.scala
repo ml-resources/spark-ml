@@ -1,4 +1,4 @@
-import breeze.linalg.{SparseVector, DenseVector, DenseMatrix}
+import breeze.linalg.{DenseVector, SparseVector}
 
 /**
   * Created by manpreet.singh on 23/01/16.

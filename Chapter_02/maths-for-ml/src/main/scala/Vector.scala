@@ -17,8 +17,8 @@ object Vector {
     sv(0) = 1
     sv(2) = 3
     sv(4) = 5
-    val m:SparseVector[Double] = sv.mapActivePairs((i,x) => x+1)
-    println(m)
+    val ma:SparseVector[Double] = sv.mapActivePairs((i,x) => x+1)
+    println(ma)
 
     // spark mllib support for local vector
     // Create a dense vector (1.0, 0.0, 3.0).
@@ -63,6 +63,33 @@ object Vector {
     println((a1 :>= b1))
     println((a1 :< b1))
     println((a1 :> b1))
+
+    // sparse mean operation
+    val svm = mean(SparseVector(0.0,1.0,2.0))
+    val svm1 = mean(SparseVector(0.0,3.0))
+    println(svm, svm1)
+
+    // sparse mul operation
+    val sva = SparseVector(0.56390,0.36231,0.14601,0.60294,0.14535)
+    val svb = SparseVector(0.15951,0.83671,0.56002,0.57797,0.54450)
+    println(sva.t * svb)
+    println(sva dot svb)
+
+    // all operations
+    val x = DenseVector(-0.4326, -1.6656, 0.1253, 0.2877, -1.1465)
+    // DenseVector(0, 0, 0, 0, 0)
+
+    val m = DenseVector(0.56390, 0.36231, 0.14601, 0.60294, 0.14535)
+
+    val r = DenseMatrix.rand(5,5)
+
+    println(m.t) // transpose
+    println(x + x) // addition
+    println(m * x) // multiplication by vector
+    println(m * 3) // by scalar
+    println(m * m) // by matrix
+    println(m :* m) // element wise mult, Matlab .*
+
   }
 
 }

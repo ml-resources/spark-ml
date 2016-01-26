@@ -13,9 +13,15 @@ libraryDependencies  ++= Seq(
   // the visualization library is distributed separately as well.
   // It depends on LGPL code.
   "org.scalanlp" %% "breeze-viz" % "0.12",
+<<<<<<< HEAD
   "org.apache.spark" %% "spark-core" % "1.6.0"
   //"org.apache.spark" %% "spark-mllib_2.10" % "1.6.0"
+=======
+  "org.apache.spark"  % "spark-core_2.11" % "1.6.0",
+  "org.apache.spark"  % "spark-mllib_2.11"  % "1.6.0"
+>>>>>>> 6e0ee602f77ebdb0d549acf7bf0dbf9e80b726e7
 )
+
 
 resolvers ++= Seq(
   // other resolvers here

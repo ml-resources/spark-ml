@@ -83,12 +83,12 @@ object Vector {
 
     val r = DenseMatrix.rand(5,5)
 
-    println(m.t) // transpose
-    println(x + x) // addition
-    println(m * x) // multiplication by vector
-    println(m * 3) // by scalar
-    println(m * m) // by matrix
-    println(m :* m) // element wise mult, Matlab .*
+//    println(m.t) // transpose
+//    println(x + x) // addition
+//    println(m * x) // multiplication by vector
+//    println(m * 3) // by scalar
+//    println(m * m) // by matrix
+//    println(m :* m) // element wise mult, Matlab .*
 
   }
 

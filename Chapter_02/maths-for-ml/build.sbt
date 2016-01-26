@@ -12,8 +12,11 @@ libraryDependencies  ++= Seq(
   "org.scalanlp" %% "breeze-natives" % "0.12",
   // the visualization library is distributed separately as well.
   // It depends on LGPL code.
-  "org.scalanlp" %% "breeze-viz" % "0.12"
+  "org.scalanlp" %% "breeze-viz" % "0.12",
+  "org.apache.spark"  % "spark-core_2.11" % "1.6.0",
+  "org.apache.spark"  % "spark-mllib_2.11"  % "1.6.0"
 )
+
 
 resolvers ++= Seq(
   // other resolvers here

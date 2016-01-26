@@ -1,7 +1,7 @@
 import breeze.linalg.{DenseMatrix, DenseVector}
 
 
-object Matrix {
+object BreezeMatrix {
 
   def main(args: Array[String]) {
     val a = DenseMatrix((1,2),(3,4))

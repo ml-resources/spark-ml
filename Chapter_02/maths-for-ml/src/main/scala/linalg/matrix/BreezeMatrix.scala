@@ -1,3 +1,5 @@
+package linalg.matrix
+
 import breeze.linalg.{DenseMatrix, DenseVector}
 
 

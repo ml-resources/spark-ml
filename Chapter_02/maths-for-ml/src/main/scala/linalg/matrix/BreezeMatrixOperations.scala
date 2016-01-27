@@ -1,10 +1,7 @@
-import breeze.linalg.{DenseMatrix, DenseVector}
-import breeze.linalg.functions._
-import breeze.math._
+package linalg.matrix
+
+import breeze.linalg.{DenseMatrix, _}
 import breeze.numerics._
-import breeze.math.Complex
-import breeze.util.DoubleImplicits
-import breeze.linalg._
 
 
 

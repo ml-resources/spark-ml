@@ -1,11 +1,11 @@
-import org.apache.spark.mllib.linalg.{Matrix, Matrices}
+package linalg.matrix
 
 
 
 object SparkMatrix {
 
   def main(args: Array[String]) {
-    import org.apache.spark.mllib.linalg.{Matrix, Matrices}
+    import org.apache.spark.mllib.linalg.{Matrices, Matrix}
 
     // Create a dense matrix ((1.0, 2.0), (3.0, 4.0), (5.0, 6.0))
     val dm: Matrix = Matrices.dense(2, 2, Array(1.0, 2.0, 3.0, 4.0))

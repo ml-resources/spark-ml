@@ -17,11 +17,14 @@ object BreezeMatrixOperations {
     val d = a*b
     println("Dot product a*b : \n" + d)
 
-    val e = 	a :+= 1
-    val f = a :< b
-
+    val e = a :+= 1
     println("Inplace Addition : a :+= 1\n" + e)
 
+    //a:*= 2.0
+    //println("Inplace Multiplication : a :*= 2.0\n" + a :*=2.0)
+
+    val f = a :< b
+    println("a :< b \n" + f)
     val g = DenseMatrix((1.1, 1.2), (3.9, 3.5))
     println("g: \n" + g)
     val gCeil =ceil(g)

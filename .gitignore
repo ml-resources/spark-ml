@@ -4,3 +4,9 @@ remachinelearningwithspark/
 Chapter_02/maths-for-ml/.idea/
 Chapter_02/maths-for-ml/project/
 Chapter_02/maths-for-ml/target/
+*.*~
+target
+metastore_db
+.idea
+derby.log
+*.png

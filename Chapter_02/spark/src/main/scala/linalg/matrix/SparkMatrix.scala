@@ -1,19 +1,19 @@
 package linalg.matrix
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-import org.apache.spark.mllib.linalg.Vectors
+
+import org.apache.spark.mllib.linalg.Matrix
+import org.apache.spark.mllib.linalg.Matrices
 import org.apache.spark.mllib.linalg.distributed.RowMatrix
 import org.apache.spark.mllib.linalg.distributed.IndexedRowMatrix
-import org.apache.spark.mllib.linalg.distributed.IndexedRow
 import org.apache.spark.mllib.linalg.distributed.CoordinateMatrix
-import org.apache.spark.mllib.linalg.distributed.DistributedMatrix
-import org.apache.spark.mllib.linalg.distributed.MatrixEntry
+import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.rdd.RDD
+import org.apache.spark.mllib.linalg.distributed.IndexedRow
+import org.apache.spark.SparkContext
+import org.apache.spark.mllib.linalg.distributed.MatrixEntry
 
 object SparkMatrix {
 
   def main(args: Array[String]) {
-    import org.apache.spark.mllib.linalg.{Matrices, Matrix}
 
     val dMatrix: Matrix = Matrices.dense(2, 2, Array(1.0, 2.0, 3.0, 4.0))
     println("dMatrix: \n" + dMatrix)

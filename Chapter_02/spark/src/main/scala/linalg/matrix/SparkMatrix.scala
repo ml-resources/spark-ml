@@ -8,7 +8,7 @@ import org.apache.spark.mllib.linalg.distributed.CoordinateMatrix
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.rdd.RDD
 import org.apache.spark.mllib.linalg.distributed.IndexedRow
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.linalg.distributed.MatrixEntry
 
 object SparkMatrix {
@@ -24,17 +24,18 @@ object SparkMatrix {
     val sMatrixTwo: Matrix = Matrices.sparse(3, 2, Array(0, 1, 3), Array(0, 1, 2), Array(5, 6, 7))
     println("sMatrixTwo: \n" + sMatrixTwo)
 
-    val sc = new SparkContext("local[2]", "First Spark App")
+    val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
+    val sc = new SparkContext(spConfig)
     val denseData = Seq(
-      Vectors.dense(0.0, 1.0, 2.0),
-      Vectors.dense(3.0, 4.0, 5.0),
-      Vectors.dense(6.0, 7.0, 8.0),
-      Vectors.dense(9.0, 0.0, 1.0)
+      Vectors.dense(0.0, 1.0, 2.1),
+      Vectors.dense(3.0, 2.0, 4.0),
+      Vectors.dense(5.0, 7.0, 8.0),
+      Vectors.dense(9.0, 0.0, 1.1)
     )
     val sparseData = Seq(
-      Vectors.sparse(3, Seq((1, 1.0), (2, 2.0))),
-      Vectors.sparse(3, Seq((0, 3.0), (1, 4.0), (2, 5.0))),
-      Vectors.sparse(3, Seq((0, 6.0), (1, 7.0), (2, 8.0))),
+      Vectors.sparse(3, Seq((1, 1.0), (2, 2.1))),
+      Vectors.sparse(3, Seq((0, 3.0), (1, 2.0), (2, 4.0))),
+      Vectors.sparse(3, Seq((0, 5.0), (1, 7.0), (2, 8.0))),
       Vectors.sparse(3, Seq((0, 9.0), (2, 1.0)))
     )
 

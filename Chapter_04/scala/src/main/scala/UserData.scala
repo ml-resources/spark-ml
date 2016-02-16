@@ -11,9 +11,10 @@ object UserData {
     var user_data = sc.textFile("../../data/ml-100k/u.user")
 
     println("user_data first" + user_data.first())
-    user_data = user_data.map(l => l.replaceAll("[|]", ","))
+    //user_data = user_data.map(l => l.replaceAll("[|]", ","))
 
-    val user_fields = user_data.map(l => l.split(","))
+    val user_fields = user_data.map(l => l.split("\\|"))
+    //val user_fields = user_data
     val num_users = user_fields.map(l => l(0)).count()
     val num_genders = user_fields.map(l => l(2)).distinct().count()
 
@@ -28,7 +29,12 @@ object UserData {
     val ages = user_fields.map( x => (x(1).toInt)).collect()
 
     val count_by_occupation = user_fields.map( fields => (fields(3), 1)).reduceByKey( (x, y) => x + y).collect()
-    println("count_by_occupation: " + count_by_occupation)
+    //println("count_by_occupation: " + count_by_occupation)
+    count_by_occupation.foreach{ e =>
+         val (c, n) = e
+         println(c+" "+n)
+    }
+
     val count_by_occupation2 = user_fields.map( fields =>  fields(3)).countByValue()
     println("count_by_occupation2: " + count_by_occupation2)
     sc.stop()

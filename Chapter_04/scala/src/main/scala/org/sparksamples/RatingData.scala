@@ -1,12 +1,18 @@
+package org.sparksamples
+
 /**
   * Created by Rajdeep on 12/22/15.
   */
 import org.apache.spark.SparkContext
 
 object RatingData {
+  val util = new Util()
+  val sc = new SparkContext("local[2]", "First Spark App")
+  util.sc = sc
+  val user_data = util.getUserData()
 
   def main(args: Array[String]) {
-    val sc = new SparkContext("local[2]", "First Spark App")
+
     val rating_data_raw = sc.textFile("../../data/ml-100k/u.data")
 
     println(rating_data_raw.first())
@@ -27,10 +33,10 @@ object RatingData {
     println("max_rating: " + max_rating)
     println("min_rating: " + min_rating)
     println("mean_rating: " + mean_rating)
-
-    var user_data = sc.textFile("../../data/ml-100k/u.user")
-    user_data = user_data.map(l => l.replaceAll("[|]", ","))
-    val user_fields = user_data.map(l => l.split(","))
+    
+    println("user_data.first():"  + user_data.first())
+    val user_fields = user_data.map(l => l.split("\\|"))
+    //var num_users = util.getUserFields()
     val num_users = user_fields.map(l => l(0)).count()
     //val median_rating = math.median(ratings.collect()) function not supported - TODO
     val ratings_per_user = num_ratings / num_users

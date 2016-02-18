@@ -1,12 +1,19 @@
+package org.sparksamples
+
 /**
   * Created by Rajdeep on 12/22/15.
   */
 import org.apache.spark.SparkContext
+import breeze.linalg.DenseVector
 
 object RatingData {
+  val util = new Util()
+  val sc = new SparkContext("local[2]", "First Spark App")
+  util.sc = sc
+  val user_data = util.getUserData()
 
   def main(args: Array[String]) {
-    val sc = new SparkContext("local[2]", "First Spark App")
+
     val rating_data_raw = sc.textFile("../../data/ml-100k/u.data")
 
     println(rating_data_raw.first())
@@ -28,9 +35,9 @@ object RatingData {
     println("min_rating: " + min_rating)
     println("mean_rating: " + mean_rating)
 
-    var user_data = sc.textFile("../../data/ml-100k/u.user")
-    user_data = user_data.map(l => l.replaceAll("[|]", ","))
-    val user_fields = user_data.map(l => l.split(","))
+    println("user_data.first():"  + user_data.first())
+    val user_fields = user_data.map(l => l.split("\\|"))
+    //var num_users = util.getUserFields()
     val num_users = user_fields.map(l => l(0)).count()
     //val median_rating = math.median(ratings.collect()) function not supported - TODO
     val ratings_per_user = num_ratings / num_users
@@ -70,7 +77,21 @@ object RatingData {
 
     println("Encoding of 'doctor : " + all_occupations_dict("doctor"))
     println("Encoding of 'programmer' : " + all_occupations_dict("programmer"))
-
+    //println(all_occupations_dict)
+    /*
+    K = len(all_occupations_dict)
+    binary_x = np.zeros(K)
+    k_programmer = all_occupations_dict['programmer']
+    binary_x[k_programmer] = 1
+    print "Binary feature vector: %s" % binary_x
+    print "Length of binary vector: %d" % K
+     */
+    val k = all_occupations_dict.size
+    val binary_x = DenseVector.zeros[Double](k)
+    val k_programmer = all_occupations_dict("programmer")
+    binary_x(k_programmer) = 1
+    println("Binary feature vector: %s" + binary_x)
+    println("Length of binary vector: " + k)
     sc.stop()
   }
 

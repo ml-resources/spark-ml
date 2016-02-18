@@ -1,3 +1,5 @@
+package org.sparksamples
+
 /**
   * Created by Rajdeep on 12/22/15.
   */

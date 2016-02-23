@@ -50,11 +50,8 @@ object UserAgesChart {
         ninty = ninty + 1
       }
 
-
     }
 
-    //val movie_ages = Util.getMovieAges(movie_data)
-    //val movie_ages_sorted = ListMap(movie_ages.toSeq.sortBy(_._1):_*)
     val ds = new org.jfree.data.category.DefaultCategoryDataset
     //ages foreach (x => ds.addValue(x._1,"User Ages", x._2))
     ds.addValue(zero,"User Ages",0)
@@ -67,7 +64,6 @@ object UserAgesChart {
     ds.addValue(seventy,"User Ages",70)
     ds.addValue(eighty,"User Ages",80)
     ds.addValue(ninty,"User Ages",90)
-    //0 -> 65, 1 -> 286, 2 -> 355, 3 -> 219, 4 -> 214, 5 -> 126
     val chart = ChartFactories.BarChart(ds)
     chart.show()
     Util.sc.stop()

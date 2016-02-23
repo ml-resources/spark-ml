@@ -7,9 +7,7 @@ package org.sparksamples
 object UserData {
 
   def main(args: Array[String]) {
-
     var user_data = Util.getUserData()
-
     println("user_data first" + user_data.first())
 
     val user_fields = user_data.map(l => l.split("\\|"))
@@ -24,6 +22,7 @@ object UserData {
     println("num_occupations: " + num_occupations)
     println("num_zipcodes: " + num_zipcodes)
     val ages = user_fields.map( x => (x(1).toInt)).collect()
+
     val count_by_occupation = user_fields.map( fields => (fields(3), 1)).reduceByKey( (x, y) => x + y).collect()
     count_by_occupation.foreach{ e =>
          val (c, n) = e

@@ -4,6 +4,9 @@
 # In[1]:
 
 get_ipython().magic(u'pylab inline')
+import os
+import pyspark
+sc = pyspark.SparkContext()
 
 
 # ## Exploring the User Dataset
@@ -11,7 +14,7 @@ get_ipython().magic(u'pylab inline')
 # In[2]:
 
 # replace this PATH with the correct path to the MovieLens dataset on your computer
-PATH = "../data"
+PATH = "/home/ubuntu/work/rajdeepd-spark-ml/spark-ml/data"
 user_data = sc.textFile("%s/ml-100k/u.user" % PATH)
 user_data.first()
 
@@ -34,7 +37,7 @@ fig = matplotlib.pyplot.gcf()
 fig.set_size_inches(16, 10)
 
 
-# In[9]:
+# In[5]:
 
 count_by_occupation = user_fields.map(lambda fields: (fields[3], 1)).reduceByKey(lambda x, y: x + y).collect()
 x_axis1 = np.array([c[0] for c in count_by_occupation])
@@ -55,7 +58,7 @@ fig = matplotlib.pyplot.gcf()
 fig.set_size_inches(16, 10)
 
 
-# In[13]:
+# In[6]:
 
 # Note we can also use the Spark RDD method 'countByValue' to generate the occupation counts
 count_by_occupation2 = user_fields.map(lambda fields: fields[3]).countByValue()
@@ -68,7 +71,7 @@ print dict(count_by_occupation)
 
 # ## Exploring the Movie Dataset
 
-# In[24]:
+# In[7]:
 
 movie_data = sc.textFile("%s/ml-100k/u.item" % PATH)
 print movie_data.first()
@@ -76,7 +79,7 @@ num_movies = movie_data.count()
 print "Movies: %d" % num_movies
 
 
-# In[46]:
+# In[8]:
 
 def convert_year(x):
     try:
@@ -91,18 +94,7 @@ years_filtered = years.filter(lambda x: x != 1900)
 # plot the movie ages histogram
 movie_ages = years_filtered.map(lambda yr: 1998-yr).countByValue()
 values = movie_ages.values()
-
-#[65, 286, 355, 219, 214, 126, 37, 22, 24, 15, 11, 13, 15, 7, 8, 5, 13, 12,
-# 8, 9, 4, 4, 5, 6, 8, 4, 3, 7, 3, 4, 6, 5, 2, 5, 2, 6, 5, 3, 5, 4, 9, 8, 4,
-# 5, 7, 2, 3, 5, 7, 4, 3, 5, 5, 4, 5, 4, 2, 5, 8, 7, 3, 4, 2, 4, 4, 2, 1, 1, 1, 1, 1]
-
 bins = movie_ages.keys()
-
-# [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-# 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-# 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-# 62, 63, 64, 65, 66, 67, 68, 72, 76]
-
 hist(values, bins=bins, color='lightblue', normed=True)
 fig = matplotlib.pyplot.gcf()
 fig.set_size_inches(16,10)
@@ -110,7 +102,7 @@ fig.set_size_inches(16,10)
 
 # ## Exploring the Rating Dataset
 
-# In[31]:
+# In[9]:
 
 rating_data_raw = sc.textFile("%s/ml-100k/u.data" % PATH)
 print rating_data_raw.first()
@@ -118,7 +110,7 @@ num_ratings = rating_data_raw.count()
 print "Ratings: %d" % num_ratings
 
 
-# In[35]:
+# In[10]:
 
 rating_data = rating_data_raw.map(lambda line: line.split("\t"))
 ratings = rating_data.map(lambda fields: int(fields[2]))
@@ -136,13 +128,13 @@ print "Average # of ratings per user: %2.2f" % ratings_per_user
 print "Average # of ratings per movie: %2.2f" % ratings_per_movie
 
 
-# In[36]:
+# In[11]:
 
 # we can also use the stats function to get some similar information to the above
 ratings.stats()
 
 
-# In[59]:
+# In[12]:
 
 # create plot of counts by rating value
 count_by_rating = ratings.countByValue()
@@ -164,7 +156,7 @@ fig = matplotlib.pyplot.gcf()
 fig.set_size_inches(16, 10)
 
 
-# In[60]:
+# In[13]:
 
 # to compute the distribution of ratings per user, we first group the ratings by user id
 user_ratings_grouped = rating_data.map(lambda fields: (int(fields[0]), int(fields[2]))).    groupByKey() 
@@ -173,7 +165,7 @@ user_ratings_byuser = user_ratings_grouped.map(lambda (k, v): (k, len(v)))
 user_ratings_byuser.take(5)
 
 
-# In[79]:
+# In[14]:
 
 # and finally plot the histogram
 user_ratings_byuser_local = user_ratings_byuser.map(lambda (k, v): v).collect()
@@ -184,18 +176,18 @@ fig.set_size_inches(16,10)
 
 # ## Filling in Bad or Missing Values
 
-# In[112]:
+# In[15]:
 
 years_pre_processed = movie_fields.map(lambda fields: fields[2]).map(lambda x: convert_year(x)).filter(lambda yr: yr != 1900).collect()
-years_pre_processed_array = np.array(years_pre_processed)   
+years_pre_processed_arr = np.array(years_pre_processed)   
 # first we compute the mean and median year of release, without the 'bad' data point
-mean_year = np.mean(years_pre_processed_array[years_pre_processed_array!=1900])
-median_year = np.median(years_pre_processed_array[years_pre_processed_array!=1900])
-idx_bad_data = np.where(years_pre_processed_array==1900)[0][0]
-years_pre_processed_array[idx_bad_data] = median_year
+mean_year = np.mean(years_pre_processed_arr[years_pre_processed_arr!=1900])
+median_year = np.median(years_pre_processed_arr[years_pre_processed_arr!=1900])
+idx_bad_data = np.where(years_pre_processed_arr==1900)[0][0]
+years_pre_processed_arr[idx_bad_data] = median_year
 print "Mean year of release: %d" % mean_year
 print "Median year of release: %d" % median_year
-print "Index of '1900' after assigning median: %s" % np.where(years_pre_processed_array == 1900)[0]
+print "Index of '1900' after assigning median: %s" % np.where(years_pre_processed_arr == 1900)[0]
 
 
 # ##Feature Extraction
@@ -362,5 +354,4 @@ print "x:\n%s" % x
 print "2-Norm of x: %2.4f" % norm_x_2
 print "Normalized x MLlib:\n%s" % normalized_x_mllib
 print "2-Norm of normalized_x_mllib: %2.4f" % np.linalg.norm(normalized_x_mllib)
-
 

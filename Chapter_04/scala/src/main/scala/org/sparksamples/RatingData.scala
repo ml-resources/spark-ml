@@ -43,7 +43,6 @@ object RatingData {
     val user_ratings_grouped = rating_data.map(fields => (fields(0).toInt, fields(2).toInt)).groupByKey()
     //Python code : user_ratings_byuser = user_ratings_grouped.map(lambda (k, v): (k, len(v)))
     val user_ratings_byuser = user_ratings_grouped.map(v =>  (v._1,v._2.size))
-    //println("user_ratings_by_user:" + user_ratings_byuser.take(5))
     val user_ratings_byuser_take5 = user_ratings_byuser.take(5)
     user_ratings_byuser_take5.foreach(println)
     val user_ratings_byuser_local = user_ratings_byuser.map(v =>  v._2).collect()

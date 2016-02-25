@@ -24,14 +24,9 @@ object UserAgesChart {
     }
 
     for(i <- 0 until ages.length){
-      println(i)
       for (j <- 0 until (max + step) by step) {
-        println(ages(i))
-        println(j)
         if(ages(i) >= (j) && ages(i) < (j + step)){
-          println("inside inner if")
           mx = mx + (j -> (mx(j) + 1))
-
         }
       }
     }

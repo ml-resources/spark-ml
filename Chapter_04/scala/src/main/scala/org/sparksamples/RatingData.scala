@@ -8,30 +8,18 @@ import java.util.Date
 import breeze.linalg.DenseVector
 
 object RatingData {
-  //val util = new Util()
-  //val sc = new SparkContext("local[2]", "First Spark App")
-  //Util.sc = sc
   val user_data = Util.getUserData()
-
   def main(args: Array[String]) {
-
     val rating_data_raw = Util.sc.textFile("../../data/ml-100k/u.data")
-
     println(rating_data_raw.first())
     val num_ratings = rating_data_raw.count()
-
+    println("num_ratings:" + num_ratings)
     val rating_data = rating_data_raw.map(line => line.split("\t"))
-    println("rating_data.first() : " + rating_data.first())
 
     val ratings = rating_data.map(fields => fields(2).toInt)
-
-    println("rating.take(10) : " + ratings.take(10))
     val max_rating = ratings.reduce( (x, y) => math.max(x, y))
-
     val min_rating = ratings.reduce( (x, y) => math.min(x, y))
-
     val mean_rating = ratings.reduce( (x, y) => x + y) / num_ratings.toFloat
-
     println("max_rating: " + max_rating)
     println("min_rating: " + min_rating)
     println("mean_rating: " + mean_rating)
@@ -50,11 +38,13 @@ object RatingData {
     val count_by_rating = ratings.countByValue()
     println("count_by_rating: + " + count_by_rating)
 
+    println(ratings.stats())
+
     val user_ratings_grouped = rating_data.map(fields => (fields(0).toInt, fields(2).toInt)).groupByKey()
     //Python code : user_ratings_byuser = user_ratings_grouped.map(lambda (k, v): (k, len(v)))
     val user_ratings_byuser = user_ratings_grouped.map(v =>  (v._1,v._2.size))
-    user_ratings_byuser.take(5)
-
+    val user_ratings_byuser_take5 = user_ratings_byuser.take(5)
+    user_ratings_byuser_take5.foreach(println)
     val user_ratings_byuser_local = user_ratings_byuser.map(v =>  v._2).collect()
     val movie_fields = Util.movieFields()
 

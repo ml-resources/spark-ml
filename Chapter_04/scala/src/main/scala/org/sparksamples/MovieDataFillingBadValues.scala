@@ -17,11 +17,12 @@ object MovieDataFillingBadValues {
 
     val num = years_filtered_valid.length
     var sum_y = 0
-    years_filtered_valid.foreach(sum_y += _)
+    years_replaced.collect().foreach(sum_y += _)
     println("Total sum of Entries:" + sum_y)
     println("Total No of Entries:" + num)
     val mean = sum_y/num
-    val median_v = median(years_filtered_valid)
+    val years_filtered_valid_sorted = years_filtered_valid.sorted
+    val median_v = median(years_filtered_valid_sorted)
     Util.sc.broadcast(mean)
     println("Mean value of Year:" + mean)
     println("Median value of Year:" + median_v)

@@ -29,7 +29,6 @@ object MovieData {
     println("movie_ages: " + movie_ages_sorted)
     println("values: " + values)
     println("bins: " + bins)
-
   }
 
 

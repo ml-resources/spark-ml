@@ -4,7 +4,7 @@ import org.apache.spark.mllib.fpm.FPGrowth
 /**
   * Created by ubuntu on 3/12/16.
   */
-object SampleFPGrowth {
+object SampleFPGrowthApp {
   def main(args: Array[String]) {
     val transactions = Seq(
       "r z h k p",

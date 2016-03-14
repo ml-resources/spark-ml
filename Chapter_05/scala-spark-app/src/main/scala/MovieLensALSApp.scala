@@ -6,15 +6,14 @@ import org.apache.spark.mllib.recommendation.{ALS, Rating}
 import org.jblas.DoubleMatrix
 
 /**
- * A simple Spark app in Scala
- */
+  * ALS applied to MovieLens Data
+  * @ author Rajdeep Dua
+  * March 2016
+  */
 object MovieLensALSApp {
 
   val PATH = "../../data"
   def main(args: Array[String]) {
-
-    //val file = new File("output-" + new Util().getDate() + ".log")
-    //val bw = new BufferedWriter(new FileWriter(file))
     val sc = new SparkContext("local[2]", "Chapter 5 App")
     val rawData = sc.textFile(PATH + "/ml-100k/u.data")
     rawData.first()
@@ -135,10 +134,8 @@ object MovieLensALSApp {
     // (1682,50)
 
     // broadcast the item factor matrix
-    val imBroadcast = sc.broadcast(itemMatrix)
-
+    //val imBroadcast = sc.broadcast(itemMatrix)
     sc.stop()
-    //bw.close()
   }
 
   object Util {
@@ -173,5 +170,4 @@ object MovieLensALSApp {
       }
     }
   }
-
 }

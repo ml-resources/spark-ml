@@ -1,10 +1,9 @@
-import java.text.SimpleDateFormat
-import java.util.Calendar
-
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.fpm.FPGrowth
-import org.apache.spark.mllib.recommendation.{ALS, Rating}
-import org.jblas.DoubleMatrix
+import org.apache.spark.mllib.recommendation.Rating
+
+import scala.collection.mutable.ListBuffer
+
 /**
  * A simple Spark app in Scala
  */
@@ -31,85 +30,41 @@ object MovieLensFPGrowthApp {
     val ratingsFirst = ratings.first()
     println(ratingsFirst)
 
-    /* Train the ALS model with rank=50, iterations=10, lambda=0.01 */
-    val model = ALS.train(ratings, 50, 10, 0.01)
-    val model2 = ALS.train(ratings, 50, 10, 0.009)
-
-    /* Inspect the user factors */
-    println( model.userFeatures)
-    /* Count user factors and force computation */
-    println("userFeatures.count:" + model.userFeatures.count)
-    println("productFeatures.count" + model.productFeatures.count)
-
-    /* Make a prediction for a single user and movie pair */
-    val predictedRating = model.predict(789, 123)
-    println(predictedRating)
     val userId = 789
     val K = 10
-    val topKRecs = model.recommendProducts(userId, K)
-    println(topKRecs.mkString("\n"))
 
     val movies = sc.textFile(PATH + "/ml-100k/u.item")
     val titles = movies.map(line => line.split("\\|").take(2)).map(array => (array(0).toInt, array(1))).collectAsMap()
     titles(123)
-    // res68: String = Frighteners, The (1996)
-    val moviesForUser = ratings.keyBy(_.user).lookup(789)
-    // moviesForUser: Seq[org.apache.spark.mllib.recommendation.Rating] = WrappedArray(Rating(789,1012,4.0), Rating(789,127,5.0), Rating(789,475,5.0), Rating(789,93,4.0), ...
-    // ...
-    //println(moviesForUser.size)
-    //moviesForUser.foreach(println)
-    moviesForUser.sortBy(-_.rating).take(10).map(rating => (titles(rating.product), rating.rating)).foreach(println)
-    topKRecs.map(rating => (titles(rating.product), rating.rating)).foreach(println)
-
-    val moviesForUser790 = ratings.keyBy(_.user).lookup(790)
-    //moviesForUser790.sortBy(-_.rating).take(10).map(rating => (titles(rating.product), rating.rating)).foreach(println)
-    val moviesForUser790_10 = moviesForUser790.sortBy(-_.rating).take(10)
-    val moviesForUser790_10_1 = moviesForUser790_10.map(r => r.product)
-    moviesForUser790_10_1.foreach(println)
 
     var eRDD = sc.emptyRDD
-    //var z = Seq()
-    var z = Seq.empty[String]
+    var z = Seq[String]()
 
-    //for (val i = 790; i < 800; )
+    val l = ListBuffer()
+    val aj = new Array[String](100)
     var i = 0
-    for( a <- 750 to 800) {
+    for( a <- 801 to 900) {
       val moviesForUserX = ratings.keyBy(_.user).lookup(a)
       val moviesForUserX_10 = moviesForUserX.sortBy(-_.rating).take(10)
       val moviesForUserX_10_1 = moviesForUserX_10.map(r => r.product)
       var temp = ""
       for( x <- moviesForUserX_10_1){
-        temp = x + " "
-        //z = x.toString :: z
-      }
-      if(i ==0 ){
-        z = Seq(temp)
-      }else {
-        i += 1
-        z.updated(i, temp)
-        //z.add
+        temp = temp + " " + x
+        println(temp)
+
       }
 
+      aj(i) = temp
+      i += 1
     }
-
-    println(z)
+    z = aj
     val transaction2 = z.map(_.split(" "))
-
-    val transactions1 = Seq(
-      "r z h k p",
-      "z y x w v u t s",
-      "s x o n r",
-      "x z y m t s q e",
-      "z",
-      "x z y r q t p")
-      .map(_.split(" "))
-    println(transactions1)
 
     val rddx = sc.parallelize(transaction2, 2).cache()
 
     val fpg = new FPGrowth()
     val model6 = fpg
-      .setMinSupport(0.4)
+      .setMinSupport(0.1)
       .setNumPartitions(1)
       .run(rddx)
 
@@ -117,39 +72,6 @@ object MovieLensFPGrowthApp {
       println(itemset.items.mkString("[", ",", "]") + ", " + itemset.freq)
     }
     sc.stop()
-  }
-
-  object Util {
-    def getDate(): String = {
-      val today = Calendar.getInstance().getTime()
-      // (2) create a date "formatter" (the date format we want)
-      val formatter = new SimpleDateFormat("yyyy-MM-dd-hh.mm.ss")
-   
-      // (3) create a new String using the date format we want
-      val folderName = formatter.format(today)
-      return folderName
-    }
-
-    def cosineSimilarity(vec1: DoubleMatrix, vec2: DoubleMatrix): Double = {
-      vec1.dot(vec2) / (vec1.norm2() * vec2.norm2())
-    }
-
-    def avgPrecisionK(actual: Seq[Int], predicted: Seq[Int], k: Int): Double = {
-      val predK = predicted.take(k)
-      var score = 0.0
-      var numHits = 0.0
-      for ((p, i) <- predK.zipWithIndex) {
-        if (actual.contains(p)) {
-          numHits += 1.0
-          score += numHits / (i.toDouble + 1.0)
-        }
-      }
-      if (actual.isEmpty) {
-        1.0
-      } else {
-        score / scala.math.min(actual.size, k).toDouble
-      }
-    }
   }
 
 }

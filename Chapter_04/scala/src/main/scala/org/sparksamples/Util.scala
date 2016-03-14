@@ -8,11 +8,12 @@ import org.apache.spark.rdd.RDD
   * Created by Rajdeep Dua on 2/2/16.
   */
 object Util {
+  val PATH = "../.."
   val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
   val sc = new SparkContext(spConfig)
 
   def getMovieData() : RDD[String] = {
-    val movie_data = sc.textFile("../../data/ml-100k/u.item")
+    val movie_data = sc.textFile(PATH + "/data/ml-100k/u.item")
     return movie_data
   }
 
@@ -45,7 +46,7 @@ object Util {
   }
 
   def getUserData() : RDD[String] = {
-    var user_data = Util.sc.textFile("../../data/ml-100k/u.user")
+    var user_data = Util.sc.textFile(PATH + "/data/ml-100k/u.user")
     return user_data
   }
 

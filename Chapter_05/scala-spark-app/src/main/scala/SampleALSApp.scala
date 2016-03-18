@@ -1,9 +1,8 @@
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.recommendation.{ALS, Rating}
 import org.jblas.DoubleMatrix
+
 import scala.collection.JavaConverters._
 import scala.math._
-
 import scala.util.Random
 
 /**
@@ -11,10 +10,9 @@ import scala.util.Random
   */
 object SampleALSApp {
   def main(args: Array[String]) {
-    Util.runALS(50, 100, 1, 15, 0.7, 0.3)
+    runALS(50, 100, 1, 15, 0.7, 0.3)
   }
-}
-object Util {
+
   def generateRatingsAsJavaList(
                                  users: Int,
                                  products: Int,
@@ -38,16 +36,9 @@ object Util {
     val rand = new Random(42)
 
     // Create a random matrix with uniform values from -1 to 1
-    def randomMatrix(m: Int, n: Int) = {
-      if (negativeFactors) {
-        new DoubleMatrix(m, n, Array.fill(m * n)(rand.nextDouble() * 2 - 1): _*)
-      } else {
-        new DoubleMatrix(m, n, Array.fill(m * n)(rand.nextDouble()): _*)
-      }
-    }
 
-    val userMatrix = randomMatrix(users, features)
-    val productMatrix = randomMatrix(features, products)
+    val userMatrix = randomMatrix(users, features, negativeFactors)
+    val productMatrix = randomMatrix(features, products, negativeFactors)
     val (trueRatings, truePrefs) = implicitPrefs match {
       case true =>
         // Generate raw values from [0,9], or if negativeWeights, from [-2,7]
@@ -67,6 +58,15 @@ object Util {
 
     (sampledRatings, trueRatings, truePrefs)
   }
+  def randomMatrix(m: Int, n: Int, negativeFactors: Boolean) = {
+    val rand = new Random(42)
+    if (negativeFactors) {
+      new DoubleMatrix(m, n, Array.fill(m * n)(rand.nextDouble() * 2 - 1): _*)
+    } else {
+      new DoubleMatrix(m, n, Array.fill(m * n)(rand.nextDouble()): _*)
+    }
+  }
+
 
   def runALS(
               users: Int,
@@ -75,18 +75,18 @@ object Util {
               iterations: Int,
               samplingRate: Double,
               matchThreshold: Double,
-              implicitPrefs: Boolean = false,
+              implicitPrefs: Boolean = true,
               bulkPredict: Boolean = false,
               negativeWeights: Boolean = false,
               numUserBlocks: Int = -1,
               numProductBlocks: Int = -1,
               negativeFactors: Boolean = true) {
-    // scalastyle:on
 
     val (sampledRatings, trueRatings, truePrefs) = generateRatings(users, products,
       features, samplingRate, implicitPrefs, negativeWeights, negativeFactors)
 
-    val sc = new SparkContext("local[2]", "Chapter 5 App")
+    //val sc = new SparkContext("local[2]", "Chapter 5 App")
+    val sc = Util.sc
     val modelx = new ALS()
     /*.setUserBlocks(numUserBlocks)
     .setProductBlocks(numProductBlocks)
@@ -101,9 +101,6 @@ object Util {
     val sampleRatingsRDD = sc.parallelize(sampledRatings)
     //val model = modelx.run(sampleRatingsRDD)
     val model = ALS.train(sampleRatingsRDD, 50, 10, 0.01)
-    //model.userFeatures
-
-    //val userFeatures = model.u
 
     val predictedU = new DoubleMatrix(users, features)
     for ((u, vec) <- model.userFeatures.collect(); i <- 0 until features) {

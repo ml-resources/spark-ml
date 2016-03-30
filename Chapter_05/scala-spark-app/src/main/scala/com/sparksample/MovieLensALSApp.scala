@@ -10,19 +10,15 @@ import org.jblas.DoubleMatrix
   */
 object MovieLensALSApp {
 
-  val PATH = "../../data"
+  //val PATH = "../../data"
   def main(args: Array[String]) {
     val sc = Util.sc
-    //val rawData = sc.textFile(PATH + "/ml-100k/u.data")
     val rawData = Util.getUserData()
     rawData.first()
-    // res24: String = 196	242	3	881250949
 
     /* Extract the user id, movie id and rating only from the dataset */
     val rawRatings = rawData.map(_.split("\t").take(3))
     println(rawRatings.first())
-    // 14/03/30 13:22:44 INFO SparkContext: Job finished: first at <console>:21, took 0.003703 s
-    // res25: Array[String] = Array(196, 242, 3)
 
     val ratings = rawRatings.map { case Array(user, movie, rating) => Rating(user.toInt, movie.toInt, rating.toDouble) }
     val ratingsFirst = ratings.first()
@@ -46,7 +42,6 @@ object MovieLensALSApp {
     val topKRecs = model.recommendProducts(userId, K)
     println(topKRecs.mkString("\n"))
 
-    //val movies = sc.textFile(PATH + "/ml-100k/u.item")
     val movies = Util.getMovieData()
     val titles = movies.map(line => line.split("\\|").take(2)).map(array => (array(0).toInt, array(1))).collectAsMap()
     titles(123)
@@ -54,6 +49,7 @@ object MovieLensALSApp {
     val moviesForUser = ratings.keyBy(_.user).lookup(789)
 
     println(moviesForUser.size)
+    //moviesForUser.sortBy(-_.rating).take(10).map(rating => (titles(rating.product), rating.rating)).foreach(println)
     moviesForUser.sortBy(-_.rating).take(10).map(rating => (titles(rating.product), rating.rating)).foreach(println)
     topKRecs.map(rating => (titles(rating.product), rating.rating)).foreach(println)
 
@@ -131,8 +127,6 @@ object MovieLensALSApp {
     println(itemMatrix.rows, itemMatrix.columns)
     // (1682,50)
 
-    // broadcast the item factor matrix
-    //val imBroadcast = sc.broadcast(itemMatrix)
     Util.sc.stop()
   }
 

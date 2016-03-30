@@ -19,12 +19,12 @@ object SampleFPGrowthApp {
 
     val fpg = new FPGrowth()
 
-    val model6 = fpg
+    val model = fpg
       .setMinSupport(0.2)
       .setNumPartitions(1)
       .run(rdd)
 
-    model6.freqItemsets.collect().foreach { itemset =>
+    model.freqItemsets.collect().foreach { itemset =>
         println(itemset.items.mkString("[", ",", "]") + ", " + itemset.freq)
     }
   }

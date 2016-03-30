@@ -1,3 +1,5 @@
+package com.sparksample
+
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.fpm.FPGrowth
 
@@ -19,12 +21,12 @@ object SampleFPGrowthApp {
 
     val fpg = new FPGrowth()
 
-    val model = fpg
+    val model6 = fpg
       .setMinSupport(0.2)
       .setNumPartitions(1)
       .run(rdd)
 
-    model.freqItemsets.collect().foreach { itemset =>
+    model6.freqItemsets.collect().foreach { itemset =>
         println(itemset.items.mkString("[", ",", "]") + ", " + itemset.freq)
     }
   }

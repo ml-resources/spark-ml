@@ -1,10 +1,9 @@
 package com.sparksample
 
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.fpm.FPGrowth
 
 /**
-  * Created by ubuntu on 3/12/16.
+  * Created by @rajdeepdua on 3/12/16.
   */
 object SampleFPGrowthApp {
   def main(args: Array[String]) {
@@ -16,7 +15,7 @@ object SampleFPGrowthApp {
       "z",
       "x z y r q t p")
       .map(_.split(" "))
-    val sc = new SparkContext("local[2]", "Chapter 5 App")
+    val sc = Util.sc
     val rdd = sc.parallelize(transactions, 2).cache()
 
     val fpg = new FPGrowth()

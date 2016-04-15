@@ -1,21 +1,18 @@
 package com.sparksample
 
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.fpm.FPGrowth
 import org.apache.spark.mllib.recommendation.Rating
 
 import scala.collection.mutable.ListBuffer
 
 /**
- * A simple Spark app in Scala
+ * @author Rajdeep Dua
  */
 object MovieLensFPGrowthApp {
 
-  val PATH = "../../data"
   def main(args: Array[String]) {
-
-    val sc = new SparkContext("local[2]", "Chapter 5 App")
-    val rawData = sc.textFile(PATH + "/ml-100k/u.data")
+    val sc = Util.sc
+    val rawData = Util.getUserData()
     rawData.first()
 
     /* Extract the user id, movie id and rating only from the dataset */
@@ -25,10 +22,7 @@ object MovieLensFPGrowthApp {
     val ratingsFirst = ratings.first()
     println(ratingsFirst)
 
-    val userId = 789
-    val K = 10
-
-    val movies = sc.textFile(PATH + "/ml-100k/u.item")
+    val movies = Util.getMovieData()
     val titles = movies.map(line => line.split("\\|").take(2)).map(array => (array(0).toInt, array(1))).collectAsMap()
     titles(123)
 
@@ -57,7 +51,6 @@ object MovieLensFPGrowthApp {
     z = aj
 
     val transaction = z.map(_.split(" "))
-
     val rddx = sc.parallelize(transaction, 2).cache()
 
     val fpg = new FPGrowth()

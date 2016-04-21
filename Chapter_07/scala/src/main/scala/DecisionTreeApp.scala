@@ -41,23 +41,21 @@ object DecisionTreeApp{
     val numLen = records.first().slice(11, 15).size
     val totalLen = catLen + numLen
 
-    print("Feature vector length for categorical features:"+ catLen)
-    print("Feature vector length for numerical features:" + numLen)
-    print("Total feature vector length: " + totalLen)
+    println("Feature vector length for categorical features:"+ catLen)
+    println("Feature vector length for numerical features:" + numLen)
+    println("Total feature vector length: " + totalLen)
 
     val data = {
-      records.map(r => LabeledPoint(Util.extractLabel(r), Util.extractFeatures(r, catLen, mappings)))
+      records.map(r => LabeledPoint(Util.extractLabel(r), Util.extract_features_dt(r)))
     }
     val first_point = data.first()
     println("Decision Tree feature vector:" + first_point.features.toString)
     println("Decision Tree feature vector length: " + first_point.features.size)
 
-    //val linear_model = LinearRegressionWithSGD.train(data, iterations, step)
     val categoricalFeaturesInfo = scala.Predef.Map[Int, Int]()
     val impurity = "variance"
     val maxDepth = 5
     val maxBins = 32
-    val dt = new DecisionTree()
 
     val decisionTreeModel = DecisionTree.trainRegressor(data, categoricalFeaturesInfo, impurity, maxDepth, maxBins )
     val true_vs_predicted = data.map(p => (p.label, decisionTreeModel.predict(p.features)))

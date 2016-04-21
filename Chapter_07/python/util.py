@@ -24,6 +24,7 @@ def extract_label(record):
     return float(record[-1])
 
 def extract_features_dt(record):
+    x = np.array(map(float, record[2:14]))
     return np.array(map(float, record[2:14]))
 
 def squared_error(actual, pred):

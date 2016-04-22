@@ -2,7 +2,8 @@ import numpy as np
 # function to get the categorical feature mapping for a given variable column
 path = "../data/hour_noheader.csv"
 def get_mapping(rdd, idx):
-    return rdd.map(lambda fields: fields[idx]).distinct().zipWithIndex().collectAsMap()
+    x = rdd.map(lambda fields: fields[idx]).distinct()
+    return x.zipWithIndex().collectAsMap()
 
 def extract_features(record,cat_len, mappings):
     cat_vec = np.zeros(cat_len)
@@ -23,6 +24,7 @@ def extract_label(record):
     return float(record[-1])
 
 def extract_features_dt(record):
+    x = np.array(map(float, record[2:14]))
     return np.array(map(float, record[2:14]))
 
 def squared_error(actual, pred):

@@ -34,10 +34,13 @@ def main():
     print first
     print num_data
     records.cache()
+    mappings_2 = get_mapping(records, 2)
 
     print "Mapping of first categorical feasture column: %s" % get_mapping(records, 2)
 
     mappings = [get_mapping(records, i) for i in range(2,10)]
+    for m in mappings:
+        print m
     cat_len = sum(map(len, mappings))
     num_len = len(records.first()[11:15])
     total_len = num_len + cat_len

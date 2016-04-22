@@ -9,9 +9,9 @@ from util import abs_error
 from util import squared_log_error
 from util import path
 from pyspark.mllib.regression import LabeledPoint
-from pyspark.mllib.regression import LinearRegressionWithSGD
-from pyspark.mllib.regression import RidgeRegressionWithSGD
-from pyspark.mllib.tree import GradientBoostedTrees
+#from pyspark.mllib.regression import LinearRegressionWithSGD
+#from pyspark.mllib.regression import RidgeRegressionWithSGD
+#from pyspark.mllib.tree import GradientBoostedTrees
 from pyspark.mllib.tree import DecisionTree
 import numpy as np
 
@@ -45,8 +45,6 @@ def main():
     print "Feature vector length for numerical features: %d" % num_len
     print "Total feature vector length: %d" % total_len
 
-    data = records.map(lambda r: LabeledPoint(extract_label(r), extract_features(r, cat_len, mappings)))
-    first_point = data.first()
 
     data_dt = records.map(lambda r: LabeledPoint(extract_label(r), extract_features_dt(r)))
     first_point_dt = data_dt.first()

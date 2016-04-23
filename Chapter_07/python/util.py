@@ -1,8 +1,11 @@
 import numpy as np
 # function to get the categorical feature mapping for a given variable column
-path = "../data/hour_noheader.csv"
+#path = "../data/hour_noheader.csv"
+path = "../data/hour_noheader_5.csv"
 def get_mapping(rdd, idx):
     x = rdd.map(lambda fields: fields[idx]).distinct()
+
+    print "x.zipWithIndex(): " + str(x.zipWithIndex())
     return x.zipWithIndex().collectAsMap()
 
 def extract_features(record,cat_len, mappings):

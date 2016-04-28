@@ -44,7 +44,6 @@ def main():
     print "Total feature vector length: %d" % total_len
 
     data = records.map(lambda r: LabeledPoint(extract_label(r), extract_features(r, cat_len, mappings)))
-    #data.saveAsTextFile("./test_file")
     first_point = data.first()
 
     print "Linear Model feature vector:\n" + str(first_point.features)

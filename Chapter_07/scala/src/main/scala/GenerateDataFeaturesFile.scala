@@ -1,5 +1,4 @@
 import org.apache.spark.SparkContext
-import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD
 
 import scala.collection.Map
@@ -15,11 +14,11 @@ object GenerateDataFeaturesFile{
   }
 
   def main(args: Array[String]) {
-    val sc = new SparkContext("local[2]", "First Spark App")
+    val sc = new SparkContext("local[1]", "First Spark App")
 
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
-    val rawData = sc.textFile("../data/hour_noheader_5.csv")
+    val rawData = sc.textFile("../data/hour_noheader.csv")
     val numData = rawData.count()
 
     val records = rawData.map(line => line.split(","))
@@ -46,8 +45,14 @@ object GenerateDataFeaturesFile{
     print("Total feature vector length: " + totalLen)
 
     val data = {
-      //records.map(r =>  Util.extractTwoFeatures(r, catLen, mappings))
-      records.map(r => LabeledPoint(Util.extractLabel(r), Util.extractFeatures(r, catLen, mappings)))
+      records.map(r => Util.extractLabel(r) + "," +  Util.extractAvgFeature(r, catLen, mappings))
+    }
+
+    val data_collection = data collect()
+    val d_iterator = data_collection.iterator
+    while(d_iterator.hasNext) {
+      val x = d_iterator.next
+      println(x)
     }
     val first_point = data.first()
     val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")

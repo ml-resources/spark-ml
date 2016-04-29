@@ -10,9 +10,7 @@ from util import squared_log_error
 from util import path
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.regression import LinearRegressionWithSGD
-from pyspark.mllib.regression import RidgeRegressionWithSGD
-from pyspark.mllib.tree import GradientBoostedTrees
-from pyspark.mllib.tree import DecisionTree
+
 import numpy as np
 
 os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"
@@ -31,12 +29,9 @@ def main():
     num_data = raw_data.count()
     records = raw_data.map(lambda x: x.split(","))
     first = records.first()
-    print first
-    print num_data
     records.cache()
-    mappings_2 = get_mapping(records, 2)
 
-    print "Mapping of first categorical feasture column: %s" % get_mapping(records, 2)
+    print "Mapping of first categorical feature column: %s" % get_mapping(records, 2)
 
     mappings = [get_mapping(records, i) for i in range(2,10)]
     for m in mappings:
@@ -66,7 +61,7 @@ def main():
     print "Linear Model - Root Mean Squared Log Error: %2.4f" % rmsle
 
 
+
 if __name__ == "__main__":
-    # execute only if run as a script
     main()
 

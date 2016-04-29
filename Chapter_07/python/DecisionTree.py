@@ -9,9 +9,7 @@ from util import abs_error
 from util import squared_log_error
 from util import path
 from pyspark.mllib.regression import LabeledPoint
-#from pyspark.mllib.regression import LinearRegressionWithSGD
-#from pyspark.mllib.regression import RidgeRegressionWithSGD
-#from pyspark.mllib.tree import GradientBoostedTrees
+
 from pyspark.mllib.tree import DecisionTree
 import numpy as np
 
@@ -26,7 +24,6 @@ except ImportError as e:
     sys.exit(1)
 
 def main():
-
     sc = SparkContext(appName="PythonApp")
     raw_data = sc.textFile(path)
     num_data = raw_data.count()
@@ -45,6 +42,7 @@ def main():
     print "Feature vector length for numerical features: %d" % num_len
     print "Total feature vector length: %d" % total_len
 
+    data = records.map(lambda r: LabeledPoint(extract_label(r), extract_features(r, cat_len, mappings)))
 
     data_dt = records.map(lambda r: LabeledPoint(extract_label(r), extract_features_dt(r)))
     first_point_dt = data_dt.first()
@@ -53,11 +51,12 @@ def main():
 
     dt_model = DecisionTree.trainRegressor(data_dt, {})
     preds = dt_model.predict(data_dt.map(lambda p: p.features))
-    actual = data_dt.map(lambda p: p.label)
+    actual = data.map(lambda p: p.label)
     true_vs_predicted_dt = actual.zip(preds)
     print "Decision Tree predictions: " + str(true_vs_predicted_dt.take(5))
     print "Decision Tree depth: " + str(dt_model.depth())
     print "Decision Tree number of nodes: " + str(dt_model.numNodes())
+
 
     mse_dt = true_vs_predicted_dt.map(lambda (t, p): squared_error(t, p)).mean()
     mae_dt = true_vs_predicted_dt.map(lambda (t, p): abs_error(t, p)).mean()

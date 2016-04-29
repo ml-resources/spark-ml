@@ -45,32 +45,7 @@ object IsotonicRegressionApp{
     val parsedData = records.map { r =>
       (Util.extractLabel(r), Util.extractAvgFeature(r, catLen, mappings), 1.0)
     }
-    /*val parsedData2 = records.map { r =>
-      Util.extractFeatures(r, catLen, mappings)
-    }
-    println("parsedData2:" + parsedData2.count())
-    val mat = new RowMatrix(parsedData2)
-    // Compute principal components.
-    val pc = mat.computePrincipalComponents(20)
-    //val svd = mat.computeSVD(20,computeU = true)
-    print(pc.numCols)
-    print(pc.numRows)
-    import org.apache.spark.mllib.linalg._
-    def toRDD(m: Matrix): RDD[Vector] = {
-      val columns = m.toArray.grouped(m.numRows)
-      val rows = columns.toSeq.transpose // Skip this if you want a column-major RDD.
-      val vectors = rows.map(row => new DenseVector(row.toArray))
-      sc.parallelize(vectors)
-    }
-    val pcaRDD = toRDD(pc)
-    pcaRDD.foreach(println)*/
 
-    /*val U: RowMatrix = svd.U // The U factor is a RowMatrix.
-    val s: Vector = svd.s // The singular values are stored in a local dense vector.
-    val V: Matrix = svd.V*/
-    //val first_point = data.first()
-    //println("Gradient Boosted Trees Model feature vector:" + first_point.features.toString)
-    //println("Gradient Boosted Trees Model feature vector length: " + first_point.features.size)
 
     val iterations = 10
     val step = 0.1

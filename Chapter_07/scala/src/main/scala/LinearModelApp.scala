@@ -52,11 +52,19 @@ object LinearModelApp{
     println("Linear Model feature vector length: " + first_point.features.size)
 
     val iterations = 10
-    val step = 0.1
-    val intercept =false
+    val step = 0.2
+    val intercept =true
 
     val linear_model = LinearRegressionWithSGD.train(data, iterations, step)
+    val x = linear_model.predict(data.first().features)
     val true_vs_predicted = data.map(p => (p.label, linear_model.predict(p.features)))
+    val true_vs_predicted_csv = data.map(p => p.label + " ,"  +linear_model.predict(p.features))
+    val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
+    val date = format.format(new java.util.Date())
+    val save = false
+    if (save){
+      true_vs_predicted_csv.saveAsTextFile("./output/linear_model_" + date + ".csv")
+    }
     val true_vs_predicted_take5 = true_vs_predicted.take(5)
     for(i <- 0 until 4) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))

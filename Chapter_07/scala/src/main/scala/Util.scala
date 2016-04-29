@@ -10,7 +10,7 @@ object Util {
     val cat_array = cat_vec.toArray
     var i = 0
     var step = 0
-    for(field <- 2 until 9){
+    for(field <- 2 until 10){
       val m = mappings(i)
       var idx = 0L
       try {
@@ -20,70 +20,122 @@ object Util {
       }catch {
         case e: Exception => print(e)
       }
-      //cat_vec
       cat_array(idx.toInt + step) = 1
       i +=1
       step = step + m.size
     }
     cat_vec = Vectors.dense(cat_array)
-    return cat_vec
+
+    val record_2 = record.slice(10,14)
+
+    val record_3 = Array.fill(record_2.length){0.0}
+    for( i<- 0 until record_2.length){
+      record_3(i) = record_2(i).toDouble
+    }
+    val total_len = cat_array.length + record_2.length
+    val record_4 = Array.fill(total_len){0.0}
+
+    for( i<- 0 until cat_array.length){
+      record_4(i) = cat_array(i)
+    }
+    for( i<- 0 until record_2.length){
+      record_4(11 + i) = record_2(i).toDouble
+    }
+
+    val final_vc = Vectors.dense(record_4)
+
+    return final_vc
   }
 
   def extract_features_dt(record : Array[String]): Vector = {
     val cat_len = record.length
     var cat_vec = Vectors.zeros(cat_len)
-    //var cat_array = cat_vec.toArray
     var cat_array = Array[Double](cat_len)
-    for(field <- 2 until 14){
-      //val m = mappings(i)
-      var idx = 0
+    var idx = 0
+    val record_2 = record.slice(2,14)
+    /*for(field <- 2 until 14){
+
       try {
-        //if (m.keySet.exists(_ == field.toString)) {
           val x = record(field).toDouble
           cat_array(idx) = x
           idx += 1
 
       }catch {
         case e: Exception => print(e)
-      }
+      }*/
 
-      //cat_vec
-      //cat_array(idx.toInt + step) = 1
-      //i +=1
-      //step = step + m.size
-    }
-    cat_vec = Vectors.dense(cat_array)
-    return cat_vec
+
+    return Vectors.dense(record_2.map(x => x.toDouble))
+
   }
+  /*
+  def extract_features_dt(record):
+    x = np.array(map(float, record[2:14]))
+    return np.array(map(float, record[2:14]))
+   */
     //return np.array(map(float, record[2:14]))
   def extractAvgFeature(record : Array[String], cat_len: Int,
                       mappings:scala.collection.immutable.List[scala.collection.Map[String,Long]]): Double ={
     //var cat_vec = Vectors.zeros(cat_len)
     //val cat_array = cat_vec.toArray
-    var sum = 0L
-    //var count = 0
+    val x = extractFeatures(record, cat_len, mappings)
+    var sum = 0.0
+    for(y <- 0 until 14){
+
+        sum = sum + x(y).toDouble
+    }
+    return sum.toDouble
+  }
+  def extractAvgFeature2(record : Array[String]): Double ={
+    //var cat_vec = Vectors.zeros(cat_len)
+    //val cat_array = cat_vec.toArray
+    val x = record
+    var sum = 0.0
+    for(y <- 0 until 14){
+
+      sum = sum + x(y).toDouble
+    }
+    return sum.toDouble
+  }
+
+  def extractTwoFeatures(record : Array[String], cat_len: Int,
+                        mappings:scala.collection.immutable.List[scala.collection.Map[String,Long]]): String ={
+
+    var sumX = 0L
     var i = 0
-    //var step = 0
-    for(field <- 2 until 9){
+    for(field <- 2 until 5){
       val m = mappings(i)
       var idx = 0L
       try {
         if (m.keySet.exists(_ == field.toString)) {
           idx = m(field.toString).toLong
-          sum = sum + idx
+          sumX = sumX + idx
         }
       }catch {
         case e: Exception => print(e)
       }
-      //cat_vec
-      //cat_array(idx.toInt + step) = 1
       i +=1
-      //step = step + m.size
+    }
+    var j = 0
+    val x = sumX/i
+    var sumY = 0L
+    for(field <- 6 until 9){
+      val m = mappings(i)
+      var idx = 0L
+      try {
+        if (m.keySet.exists(_ == field.toString)) {
+          idx = m(field.toString).toLong
+          sumY = sumY + idx
+        }
+      }catch {
+        case e: Exception => print(e)
+      }
+      j +=1
 
     }
-    val avg = sum/i
-    //cat_vec = Vectors.dense(cat_array)
-    return avg
+    val y = sumY/j
+
+    return x + ", "  + y
   }
 
   def extractLabel(r: Array[String]): Double ={

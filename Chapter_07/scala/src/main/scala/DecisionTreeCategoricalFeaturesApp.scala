@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 /**
  * A simple Spark app in Scala
  */
-object DecisionTreeApp{
+object DecisionTreeCategoricalFeaturesApp{
 
   def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
     return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
@@ -56,13 +56,28 @@ object DecisionTreeApp{
     println("Decision Tree feature vector:" + first_point.features.toString)
     println("Decision Tree feature vector length: " + first_point.features.size)
 
-    val categoricalFeaturesInfo = scala.Predef.Map[Int, Int]()
+
+    def getCatFeatures(): scala.Predef.Map[Int, Int] = {
+
+      var d = scala.Predef.Map[Int, Int]()
+
+      for(a <- 2 until 10){
+        d += (a-2 -> (get_mapping(records, a).size + 1))
+        //d.put(a-2,get_mapping(records, a).size + 1)
+      }
+      return d
+
+    }
+    val cat_features = getCatFeatures()
+    //dict([(i - 2, len(get_mapping(records, i)) + 1) for i in range(2,10)])
+
+    //val categoricalFeaturesInfo = scala.Predef.Map[Int, Int]()
     val impurity = "variance"
     val maxDepth = 5
     val maxBins = 32
-
-    val decisionTreeModel = DecisionTree.trainRegressor(data_dt, categoricalFeaturesInfo,
-      impurity, maxDepth, maxBins )
+    val decisionTreeModel= DecisionTree.trainRegressor(data_dt, cat_features,  impurity, maxDepth, maxBins)
+    //val decisionTreeModel = DecisionTree.trainRegressor(data_dt, categoricalFeaturesInfo,
+    //  impurity, maxDepth, maxBins )
 
     val preds = decisionTreeModel.predict(data_dt.map( p=> p.features))
     val actual = data.map( p=> p.label)
@@ -74,17 +89,7 @@ object DecisionTreeApp{
     if (save){
       true_vs_predicted_csv.saveAsTextFile("./output/decision_tree_" + date + ".csv")
     }
-    //val true_vs_predicted_dt = data_dt.map(p => (p.label, decisionTreeModel.predict(p.features)))
-    /*val true_vs_predicted_dt_take5 = true_vs_predicted_dt.take(5)
-    for(i <- 0 until 4) {
-      println("True vs Predicted: " + "i :" + true_vs_predicted_dt_take5(i))
-    }*/
-    /*
-    dt_model = DecisionTree.trainRegressor(data_dt, {})
-    preds = dt_model.predict(data_dt.map(lambda p: p.features))
-    actual = data.map(lambda p: p.label)
-     true_vs_predicted_dt = actual.zip(preds)
-     */
+
     print("Decision Tree depth: " + decisionTreeModel.depth)
     print("Decision Tree number of nodes: " + decisionTreeModel.numNodes)
     val mse = true_vs_predicted_dt.map{ case(t, p) => Util.squaredError(t, p)}.mean()

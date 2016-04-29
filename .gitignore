@@ -10,3 +10,4 @@ metastore_db
 .idea
 derby.log
 *.png
+*.pyc

@@ -1,9 +1,10 @@
 package org.sparksamples.classification.stumbleupon
 
+import org.apache.log4j.Logger
+import org.apache.spark.ml.classification.NaiveBayes
+import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler}
 import org.apache.spark.ml.{Pipeline, PipelineStage}
-import org.apache.spark.ml.feature.VectorAssembler
-import org.apache.spark.mllib.classification.NaiveBayes
-import org.apache.spark.mllib.evaluation.MulticlassMetrics
+import org.apache.spark.mllib.evaluation.{MulticlassMetrics, RegressionMetrics}
 import org.apache.spark.sql.DataFrame
 
 import scala.collection.mutable
@@ -12,6 +13,7 @@ import scala.collection.mutable
   * Created by manpreet.singh on 01/05/16.
   */
 object NaiveBayesPipeline {
+  @transient lazy val logger = Logger.getLogger(getClass.getName)
 
   def naiveBayesPipeline(vectorAssembler: VectorAssembler, dataFrame: DataFrame) = {
     val Array(training, test) = dataFrame.randomSplit(Array(0.9, 0.1), seed = 12345)
@@ -19,9 +21,15 @@ object NaiveBayesPipeline {
     // Set up Pipeline
     val stages = new mutable.ArrayBuffer[PipelineStage]()
 
+    val labelIndexer = new StringIndexer()
+      .setInputCol("label")
+      .setOutputCol("indexedLabel")
+    stages += labelIndexer
+
     val nb = new NaiveBayes()
 
     stages += vectorAssembler
+    stages += nb
     val pipeline = new Pipeline().setStages(stages.toArray)
 
     // Fit the Pipeline
@@ -30,10 +38,34 @@ object NaiveBayesPipeline {
     val elapsedTime = (System.nanoTime() - startTime) / 1e9
     println(s"Training time: $elapsedTime seconds")
 
+    val holdout = model.transform(test).select("prediction","label")
+
+    // have to do a type conversion for RegressionMetrics
+    val rm = new RegressionMetrics(holdout.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double])))
+
+    logger.info("Test Metrics")
+    logger.info("Test Explained Variance:")
+    logger.info(rm.explainedVariance)
+    logger.info("Test R^2 Coef:")
+    logger.info(rm.r2)
+    logger.info("Test MSE:")
+    logger.info(rm.meanSquaredError)
+    logger.info("Test RMSE:")
+    logger.info(rm.rootMeanSquaredError)
+
     val predictions = model.transform(test).select("prediction").rdd.map(_.getDouble(0))
     val labels = model.transform(test).select("label").rdd.map(_.getDouble(0))
     val accuracy = new MulticlassMetrics(predictions.zip(labels)).precision
     println(s"  Accuracy : $accuracy")
+
+    savePredictions(holdout, test, rm, "/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/sparkMLlib/dataset/stumbleupon/results/NaiveBayes.csv")
   }
 
+  def savePredictions(predictions:DataFrame, testRaw:DataFrame, regressionMetrics: RegressionMetrics, filePath:String) = {
+    predictions
+      .coalesce(1)
+      .write.format("com.databricks.spark.csv")
+      .option("header", "true")
+      .save(filePath)
+  }
 }

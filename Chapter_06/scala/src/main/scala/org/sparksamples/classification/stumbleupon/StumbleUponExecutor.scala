@@ -1,20 +1,11 @@
 package org.sparksamples.classification.stumbleupon
 
-import org.apache.log4j.{Logger}
+import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
-import org.apache.spark.ml.{PipelineStage, Pipeline}
-import org.apache.spark.ml.classification.{GBTClassifier, RandomForestClassifier, DecisionTreeClassifier, LogisticRegression}
-import org.apache.spark.ml.evaluation.{MulticlassClassificationEvaluator, RegressionEvaluator}
-import org.apache.spark.ml.feature.{IndexToString, VectorIndexer, StringIndexer, VectorAssembler}
-import org.apache.spark.ml.regression.LinearRegression
-import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
-import org.apache.spark.mllib.classification.NaiveBayes
-import org.apache.spark.mllib.evaluation.{MulticlassMetrics, RegressionMetrics}
-import org.apache.spark.sql.types.{DoubleType, DataType}
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.functions._
-
-import scala.collection.mutable
+import org.apache.spark.sql.types.DataType
+import org.apache.spark.sql.{DataFrame, SQLContext}
 
 
 /**
@@ -108,8 +99,21 @@ object StumbleUponExecutor {
         ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
       .setOutputCol("features")
 
-    val command = "LR"
-    executeCommand(command, assembler, df4)
+    val df5 = prepareForNaiveBayes(df4)
+
+    val command = "NB"
+
+    if(command.equals("NB")) {
+      val nbAssembler = new VectorAssembler()
+        .setInputCols(Array("avglinksize", "commonlinkratio_1", "commonlinkratio_2", "commonlinkratio_3", "commonlinkratio_4", "compression_ratio"
+          , "embed_ratio", "framebased", "frameTagRatio", "hasDomainLink", "html_ratio", "image_ratio"
+          ,"is_news", "lengthyLinkDomain", "linkwordscore", "news_front_page", "non_markup_alphanum_characters", "numberOfLinks"
+          ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
+        .setOutputCol("features")
+
+      executeCommand(command, nbAssembler, df5)
+    } else
+      executeCommand(command, assembler, df4)
   }
 
   def executeCommand(arg: String, vectorAssembler: VectorAssembler, dataFrame: DataFrame) = arg match {
@@ -122,6 +126,36 @@ object StumbleUponExecutor {
     case "GBT" => GradientBoostedTreePipeline.gradientBoostedTreePipeline(vectorAssembler, dataFrame)
 
     case "NB" => NaiveBayesPipeline.naiveBayesPipeline(vectorAssembler, dataFrame)
+  }
+
+  def prepareForNaiveBayes(dataFrame: DataFrame): DataFrame = {
+    // user defined function for cleanup of ?
+    val replacefunc = udf {(x:Double) => if(x < 0) 0.0 else x}
+
+    val df5 = dataFrame.withColumn("avglinksize", replacefunc(dataFrame("avglinksize")))
+      .withColumn("commonlinkratio_1", replacefunc(dataFrame("commonlinkratio_1")))
+      .withColumn("commonlinkratio_2", replacefunc(dataFrame("commonlinkratio_2")))
+      .withColumn("commonlinkratio_3", replacefunc(dataFrame("commonlinkratio_3")))
+      .withColumn("commonlinkratio_4", replacefunc(dataFrame("commonlinkratio_4")))
+      .withColumn("compression_ratio", replacefunc(dataFrame("compression_ratio")))
+      .withColumn("embed_ratio", replacefunc(dataFrame("embed_ratio")))
+      .withColumn("framebased", replacefunc(dataFrame("framebased")))
+      .withColumn("frameTagRatio", replacefunc(dataFrame("frameTagRatio")))
+      .withColumn("hasDomainLink", replacefunc(dataFrame("hasDomainLink")))
+      .withColumn("html_ratio", replacefunc(dataFrame("html_ratio")))
+      .withColumn("image_ratio", replacefunc(dataFrame("image_ratio")))
+      .withColumn("is_news", replacefunc(dataFrame("is_news")))
+      .withColumn("lengthyLinkDomain", replacefunc(dataFrame("lengthyLinkDomain")))
+      .withColumn("linkwordscore", replacefunc(dataFrame("linkwordscore")))
+      .withColumn("news_front_page", replacefunc(dataFrame("news_front_page")))
+      .withColumn("non_markup_alphanum_characters", replacefunc(dataFrame("non_markup_alphanum_characters")))
+      .withColumn("numberOfLinks", replacefunc(dataFrame("numberOfLinks")))
+      .withColumn("numwords_in_url", replacefunc(dataFrame("numwords_in_url")))
+      .withColumn("parametrizedLinkRatio", replacefunc(dataFrame("parametrizedLinkRatio")))
+      .withColumn("spelling_errors_ratio", replacefunc(dataFrame("spelling_errors_ratio")))
+      .withColumn("label", replacefunc(dataFrame("label")))
+
+    return df5
   }
 
   object DFHelper

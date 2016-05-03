@@ -58,7 +58,8 @@ object NaiveBayesPipeline {
     val accuracy = new MulticlassMetrics(predictions.zip(labels)).precision
     println(s"  Accuracy : $accuracy")
 
-    savePredictions(holdout, test, rm, "/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/sparkMLlib/dataset/stumbleupon/results/NaiveBayes.csv")
+    savePredictions(holdout, test, rm,
+      SparkConstants.PATH + "/results/NaiveBayes-results.csv")
   }
 
   def savePredictions(predictions:DataFrame, testRaw:DataFrame, regressionMetrics: RegressionMetrics, filePath:String) = {

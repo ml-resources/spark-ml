@@ -23,7 +23,7 @@ object StumbleUponExecutor {
 
     // get dataframe
     val df = sqlContext.read.format("com.databricks.spark.csv").option("delimiter", "\t").option("header", "true")
-      .option("inferSchema", "true").load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/sparkMLlib/dataset/stumbleupon/train.tsv")
+      .option("inferSchema", "true").load("/home/ubuntu/work/ml-resources/spark-ml/Chapter_06/data/train.tsv")
 
     // pre-processing
     df.registerTempTable("StumbleUpon")
@@ -55,6 +55,8 @@ object StumbleUponExecutor {
       .withColumn("label", df("label").cast("double"))
     df1.printSchema()
 
+
+
     // user defined function for cleanup of ?
     val replacefunc = udf {(x:Double) => if(x == "?") 0.0 else x}
 
@@ -80,7 +82,6 @@ object StumbleUponExecutor {
       .withColumn("parametrizedLinkRatio", replacefunc(df1("parametrizedLinkRatio")))
       .withColumn("spelling_errors_ratio", replacefunc(df1("spelling_errors_ratio")))
       .withColumn("label", replacefunc(df1("label")))
-
     // drop first 4 columns
     val df3 = df2.drop("url").drop("urlid").drop("boilerplate").drop("alchemy_category").drop("alchemy_category_score")
 

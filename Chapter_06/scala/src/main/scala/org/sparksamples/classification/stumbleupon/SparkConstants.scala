@@ -6,5 +6,6 @@ package org.sparksamples.classification.stumbleupon
 object SparkConstants {
 
   val SparkMaster = "local[2]"
+  val PATH="/home/ubuntu/work/ml-resources/spark-ml/Chapter_06/"
 
 }

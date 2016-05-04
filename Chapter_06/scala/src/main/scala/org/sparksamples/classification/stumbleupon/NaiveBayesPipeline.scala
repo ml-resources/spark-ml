@@ -14,7 +14,7 @@ import scala.collection.mutable
   */
 object NaiveBayesPipeline {
   @transient lazy val logger = Logger.getLogger(getClass.getName)
-
+  val completeData = true
   def naiveBayesPipeline(vectorAssembler: VectorAssembler, dataFrame: DataFrame) = {
     val Array(training, test) = dataFrame.randomSplit(Array(0.9, 0.1), seed = 12345)
 
@@ -39,6 +39,7 @@ object NaiveBayesPipeline {
     println(s"Training time: $elapsedTime seconds")
 
     val holdout = model.transform(test).select("prediction","label")
+    val holdout_complete = model.transform(dataFrame).select("prediction")
 
     // have to do a type conversion for RegressionMetrics
     val rm = new RegressionMetrics(holdout.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double])))
@@ -54,12 +55,20 @@ object NaiveBayesPipeline {
     logger.info(rm.rootMeanSquaredError)
 
     val predictions = model.transform(test).select("prediction").rdd.map(_.getDouble(0))
+    val predictions_complete = model.transform(dataFrame).select("prediction").rdd.map(_.getDouble(0))
     val labels = model.transform(test).select("label").rdd.map(_.getDouble(0))
     val accuracy = new MulticlassMetrics(predictions.zip(labels)).precision
     println(s"  Accuracy : $accuracy")
 
-    savePredictions(holdout, test, rm,
-      SparkConstants.PATH + "/results/NaiveBayes-results.csv")
+    if (!completeData){
+      savePredictions(holdout, test, rm,
+        SparkConstants.PATH + "/results/NaiveBayes-results.csv")
+    } else {
+      saveOnlyPredictions(holdout_complete, rm,
+        SparkConstants.PATH + "/results/NaiveBayes-results-complete.csv")
+    }
+
+
   }
 
   def savePredictions(predictions:DataFrame, testRaw:DataFrame, regressionMetrics: RegressionMetrics, filePath:String) = {
@@ -67,6 +76,13 @@ object NaiveBayesPipeline {
       .coalesce(1)
       .write.format("com.databricks.spark.csv")
       .option("header", "true")
+      .save(filePath)
+  }
+  def saveOnlyPredictions(predictions:DataFrame, regressionMetrics: RegressionMetrics, filePath:String) = {
+    predictions
+      .coalesce(1)
+      .write.format("com.databricks.spark.csv")
+      .option("header", "false")
       .save(filePath)
   }
 }

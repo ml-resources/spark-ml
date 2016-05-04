@@ -4,7 +4,8 @@ import org.apache.spark.SparkContext
 import org.sparksamples.classification.stumbleupon.SparkConstants
 
 /**
-	* @author manpreet.singh
+	* @author Rajdeep dua
+	*         
 	*/
 
 object DataPersistenceApp {

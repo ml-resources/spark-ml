@@ -43,11 +43,13 @@ object RandomForestPipeline {
 
     // Fit the Pipeline
     val startTime = System.nanoTime()
-    val model = pipeline.fit(training)
+    //val model = pipeline.fit(training)
+    val model = pipeline.fit(dataFrame)
     val elapsedTime = (System.nanoTime() - startTime) / 1e9
     println(s"Training time: $elapsedTime seconds")
 
-    val holdout = model.transform(test).select("prediction","label")
+    //val holdout = model.transform(test).select("prediction","label")
+    val holdout = model.transform(dataFrame).select("prediction","label")
 
     // have to do a type conversion for RegressionMetrics
     val rm = new RegressionMetrics(holdout.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double])))
@@ -67,7 +69,9 @@ object RandomForestPipeline {
     val accuracy = new MulticlassMetrics(predictions.zip(labels)).precision
     println(s"  Accuracy : $accuracy")
 
-    savePredictions(holdout, test, rm, "/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/sparkMLlib/dataset/stumbleupon/results/RandomForest.csv")
+    holdout.rdd.map(x => x(0).asInstanceOf[Double]).repartition(1).saveAsTextFile("/home/ubuntu/work/ml-resources/spark-ml/results/RF.xls")
+
+    savePredictions(holdout, test, rm, "/home/ubuntu/work/ml-resources/spark-ml/results/RandomForest.csv")
   }
 
   def savePredictions(predictions:DataFrame, testRaw:DataFrame, regressionMetrics: RegressionMetrics, filePath:String) = {

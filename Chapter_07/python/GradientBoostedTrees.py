@@ -8,6 +8,8 @@ from util import squared_error
 from util import abs_error
 from util import squared_log_error
 from util import path
+from util import get_records
+
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.tree import GradientBoostedTrees
 
@@ -27,26 +29,16 @@ except ImportError as e:
     print ("Error importing Spark Modules", e)
     sys.exit(1)
 def main():
-    sc = SparkContext(appName="PythonApp")
-    raw_data = sc.textFile(path)
-    num_data = raw_data.count()
-    records = raw_data.map(lambda x: x.split(","))
+    records = get_records()
     first = records.first()
-    print first
-    print num_data
     records.cache()
-    # we want to extract the feature mappings for columns 2 - 9
-    # try it out on column 2 first
-    print "Mapping of first categorical feasture column: %s" % get_mapping(records, 2)
+
 
     # extract all the catgorical mappings
     mappings = [get_mapping(records, i) for i in range(2,10)]
     cat_len = sum(map(len, mappings))
     num_len = len(records.first()[11:15])
     total_len = num_len + cat_len
-    print "Feature vector length for categorical features: %d" % cat_len
-    print "Feature vector length for numerical features: %d" % num_len
-    print "Total feature vector length: %d" % total_len
 
     data = records.map(lambda r: LabeledPoint(extract_label(r), extract_features(r, cat_len, mappings)))
     first_point = data.first()

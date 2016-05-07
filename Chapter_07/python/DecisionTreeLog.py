@@ -4,10 +4,9 @@ from util import get_mapping
 from util import extract_features
 from util import extract_label
 from util import extract_features_dt
-from util import squared_error
-from util import abs_error
-from util import squared_log_error
-from util import path
+
+from util import get_records
+from util import calculate_print_metrics
 from pyspark.mllib.regression import LabeledPoint
 
 from pyspark.mllib.tree import DecisionTree
@@ -24,10 +23,7 @@ except ImportError as e:
     sys.exit(1)
 
 def main():
-    sc = SparkContext(appName="PythonApp")
-    raw_data = sc.textFile(path)
-    num_data = raw_data.count()
-    records = raw_data.map(lambda x: x.split(","))
+    records = get_records()
     first = records.first()
     records.cache()
 
@@ -43,7 +39,6 @@ def main():
     print "Total feature vector length: %d" % total_len
 
     data = records.map(lambda r: LabeledPoint(extract_label(r), extract_features(r, cat_len, mappings)))
-
     data_dt = records.map(lambda r: LabeledPoint(extract_label(r), extract_features_dt(r)))
 
     first_point_dt = data_dt.first()
@@ -62,14 +57,8 @@ def main():
     actual_log = data_dt_log.map(lambda p: p.label)
     true_vs_predicted_dt_log = actual_log.zip(preds_log).map(lambda (t, p): (np.exp(t), np.exp(p)))
 
-    mse_log_dt = true_vs_predicted_dt_log.map(lambda (t, p): squared_error(t, p)).mean()
-    mae_log_dt = true_vs_predicted_dt_log.map(lambda (t, p): abs_error(t, p)).mean()
-    rmsle_log_dt = np.sqrt(true_vs_predicted_dt_log.map(lambda (t, p): squared_log_error(t, p)).mean())
-    print "Mean Squared Error: %2.4f" % mse_log_dt
-    print "Mean Absolute Error: %2.4f" % mae_log_dt
-    print "Root Mean Squared Log Error: %2.4f" % rmsle_log_dt
-    print "Non log-transformed predictions:\n" + str(true_vs_predicted_dt.take(3))
-    print "Log-transformed predictions:\n" + str(true_vs_predicted_dt_log.take(3))
+    calculate_print_metrics("Decision Tree Log", true_vs_predicted_dt_log)
+
 
 if __name__ == "__main__":
     main()

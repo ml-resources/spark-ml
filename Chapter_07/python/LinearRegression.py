@@ -4,17 +4,12 @@ from util import get_mapping
 from util import extract_features
 from util import extract_label
 from util import extract_features_dt
-from util import squared_error
-from util import abs_error
-from util import squared_log_error
-from util import path
+
+from util import get_records
+from util import calculate_print_metrics
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.regression import LinearRegressionWithSGD
 
-import numpy as np
-
-os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"
-sys.path.append("/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6//python")
 
 try:
     from pyspark import SparkContext
@@ -24,13 +19,8 @@ except ImportError as e:
     sys.exit(1)
 
 def main():
-    sc = SparkContext(appName="PythonApp")
-    raw_data = sc.textFile(path)
-    num_data = raw_data.count()
-    records = raw_data.map(lambda x: x.split(","))
-    first = records.first()
+    records = get_records()
     records.cache()
-
     print "Mapping of first categorical feature column: %s" % get_mapping(records, 2)
 
     mappings = [get_mapping(records, i) for i in range(2,10)]
@@ -53,13 +43,7 @@ def main():
     true_vs_predicted = data.map(lambda p: (p.label, linear_model.predict(p.features)))
     print "Linear Model predictions: " + str(true_vs_predicted.take(5))
 
-    mse = true_vs_predicted.map(lambda (t, p): squared_error(t, p)).mean()
-    mae = true_vs_predicted.map(lambda (t, p): abs_error(t, p)).mean()
-    rmsle = np.sqrt(true_vs_predicted.map(lambda (t, p): squared_log_error(t, p)).mean())
-    print "Linear Model - Mean Squared Error: %2.4f" % mse
-    print "Linear Model - Mean Absolute Error: %2.4f" % mae
-    print "Linear Model - Root Mean Squared Log Error: %2.4f" % rmsle
-
+    calculate_print_metrics("Linear Regression", true_vs_predicted)
 
 
 if __name__ == "__main__":

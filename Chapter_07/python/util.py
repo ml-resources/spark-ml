@@ -1,7 +1,28 @@
+import sys
 import numpy as np
-# function to get the categorical feature mapping for a given variable column
-#path = "../data/hour_noheader.csv"
-path = "../data/hour_noheader_5.csv"
+try:
+    from pyspark import SparkContext
+    from pyspark import SparkConf
+except ImportError as e:
+    print ("Error importing Spark Modules", e)
+    sys.exit(1)
+path = "../data/hour_noheader.csv"
+
+def get_records():
+    sc = SparkContext(appName="PythonApp")
+    raw_data = sc.textFile(path)
+    num_data = raw_data.count()
+    records = raw_data.map(lambda x: x.split(","))
+    return records
+
+def calculate_print_metrics(model_name, true_vs_predicted):
+    mse = true_vs_predicted.map(lambda (t, p): squared_error(t, p)).mean()
+    mae = true_vs_predicted.map(lambda (t, p): abs_error(t, p)).mean()
+    rmsle = np.sqrt(true_vs_predicted.map(lambda (t, p): squared_log_error(t, p)).mean())
+    print model_name + " - Mean Squared Error: %2.4f" % mse
+    print model_name + " - Mean Absolute Error: %2.4f" % mae
+    print model_name + " - Root Mean Squared Log Error: %2.4f" % rmsle
+
 def get_mapping(rdd, idx):
     x = rdd.map(lambda fields: fields[idx]).distinct()
 

@@ -1,20 +1,15 @@
 import os
 import sys
-from util import get_mapping
-from util import extract_features
-from util import extract_label
-from util import extract_features_dt
-from util import squared_error
-from util import abs_error
-from util import squared_log_error
-from util import path
-from util import get_records
+import numpy as np
 
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.tree import GradientBoostedTrees
 
+from com.sparksamples.util import get_mapping
+from com.sparksamples.util import extract_features
+from com.sparksamples.util import extract_label
+from com.sparksamples.util import get_records
 
-import numpy as np
 # Set the path for spark installation
 # this is the path where you have built spark using sbt/sbt assembly
 os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"

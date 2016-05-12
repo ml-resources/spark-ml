@@ -1,13 +1,13 @@
-import org.apache.spark.SparkContext
+import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
 import org.apache.spark.rdd.RDD
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
-import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.regression.LinearRegressionWithSGD
+
 /**
- * A simple Spark app in Scala
- */
+  * LogisticalRegression App
+  * @author Rajdeep Dua
+  */
 object LinearModelApp{
 
   def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
@@ -15,17 +15,13 @@ object LinearModelApp{
   }
 
   def main(args: Array[String]) {
-    val sc = new SparkContext("local[2]", "First Spark App")
 
-    // we take the raw data in CSV format and convert it into a set of records
-    // of the form (user, product, price)
-    val rawData = sc.textFile("../data/hour_noheader.csv")
-    val numData = rawData.count()
-
-    val records = rawData.map(line => line.split(","))
+    val recordsArray = Util.getRecords()
+    val records = recordsArray._1
     val first = records.first()
+    val numData = recordsArray._2
 
-    println(numData.toInt)
+    println(numData.toString())
     records.cache()
     print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
     var list = new ListBuffer[Map[String, Long]]()
@@ -76,7 +72,7 @@ object LinearModelApp{
     println("Linear Model - Mean Squared Error: "  + mse)
     println("Linear Model - Mean Absolute Error: " + mae)
     println("Linear Model - Root Mean Squared Log Error:" + rmsle)
-    sc.stop()
+
   }
 
 }

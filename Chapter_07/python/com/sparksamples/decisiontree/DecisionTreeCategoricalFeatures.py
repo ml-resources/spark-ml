@@ -1,14 +1,16 @@
 import os
 import sys
-from util import get_mapping
-from util import extract_features
-from util import extract_label
-from util import extract_features_dt
-from util import get_records
-from util import calculate_print_metrics
-from pyspark.mllib.regression import LabeledPoint
 
+from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.tree import DecisionTree
+
+from com.sparksamples.util import get_mapping
+from com.sparksamples.util import extract_features
+from com.sparksamples.util import extract_label
+from com.sparksamples.util import extract_features_dt
+from com.sparksamples.util import get_records
+from com.sparksamples.util import calculate_print_metrics
+
 
 os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"
 sys.path.append("/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6//python")

@@ -1,16 +1,15 @@
-import os
 import sys
-from util import get_mapping
-from util import extract_features
-from util import extract_label
+import numpy as np
 
-from util import path
-from util import calculate_print_metrics
-from util import get_records
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.regression import LinearRegressionWithSGD
 
-import numpy as np
+from com.sparksamples.util import get_mapping
+from com.sparksamples.util import extract_features
+from com.sparksamples.util import extract_label
+from com.sparksamples.util import path
+from com.sparksamples.util import calculate_print_metrics
+
 
 try:
     from pyspark import SparkContext
@@ -20,7 +19,13 @@ except ImportError as e:
     sys.exit(1)
 
 def main():
-    records = get_records()
+    #records = get_records()
+    conf = SparkConf().setMaster("local").setAppName("My app")
+
+    sc = SparkContext(conf =conf)
+    raw_data = sc.textFile(path)
+    num_data = raw_data.count()
+    records = raw_data.map(lambda x: x.split(","))
     mappings = [get_mapping(records, i) for i in range(2,10)]
 
     cat_len = sum(map(len, mappings))

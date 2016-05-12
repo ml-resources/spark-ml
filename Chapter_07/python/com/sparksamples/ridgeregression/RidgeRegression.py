@@ -1,13 +1,15 @@
 import os
 import sys
-from util import get_mapping
-from util import extract_features
-from util import extract_label
 
-from util import get_records
-from util import calculate_print_metrics
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.regression import RidgeRegressionWithSGD
+
+from com.sparksamples.util import get_mapping
+from com.sparksamples.util import extract_features
+from com.sparksamples.util import extract_label
+from com.sparksamples.util import get_records
+from com.sparksamples.util import calculate_print_metrics
+
 
 
 # Set the path for spark installation

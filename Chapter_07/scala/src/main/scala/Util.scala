@@ -1,8 +1,26 @@
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.{SparkConf, SparkContext}
 /**
   * Created by rajdeep dua on 4/15/16.
   */
 object Util {
+  val PATH= "../data/hour_noheader.csv"
+  val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
+  val sc = new SparkContext(spConfig)
+
+  def getRecords() : (RDD[Array[String]],Long) ={
+    //val sc = new SparkContext("local[2]", "First Spark App")
+    //val conf = new SparkConf().setMaster("local").setAppName("GradientBoostedTreesRegressionApp")
+    //sc = new SparkContext(conf)
+    // we take the raw data in CSV format and convert it into a set of records
+    // of the form (user, product, price)
+    val rawData = sc.textFile(PATH)
+    val numData = rawData.count()
+
+    val records = rawData.map(line => line.split(","))
+    return (records, numData)
+  }
 
   def extractFeatures(record : Array[String], cat_len: Int,
                       mappings:scala.collection.immutable.List[scala.collection.Map[String,Long]]): Vector ={

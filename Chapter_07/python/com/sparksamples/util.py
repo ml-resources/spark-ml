@@ -1,15 +1,22 @@
 import sys
 import numpy as np
+
+from pyspark.mllib.regression import LinearRegressionWithSGD
 try:
     from pyspark import SparkContext
     from pyspark import SparkConf
 except ImportError as e:
     print ("Error importing Spark Modules", e)
     sys.exit(1)
-path = "../data/hour_noheader.csv"
+PROJECT_HOME = "/home/ubuntu/work/ml-resources/spark-ml"
+path = PROJECT_HOME + "/Chapter_07/data/hour_noheader.csv"
 
 def get_records():
-    sc = SparkContext(appName="PythonApp")
+    conf = (SparkConf()
+         .setMaster("local")
+         .setAppName("My app")
+         )
+    sc = SparkContext(conf =conf)
     raw_data = sc.textFile(path)
     num_data = raw_data.count()
     records = raw_data.map(lambda x: x.split(","))
@@ -60,3 +67,9 @@ def abs_error(actual, pred):
 
 def squared_log_error(pred, actual):
     return (np.log(pred + 1) - np.log(actual + 1))**2
+
+def evaluate(train, test, iterations, step, regParam, regType, intercept):
+    model = LinearRegressionWithSGD.train(train, iterations, step, regParam=regParam, regType=regType, intercept=intercept)
+    tp = test.map(lambda p: (p.label, model.predict(p.features)))
+    rmsle = np.sqrt(tp.map(lambda (t, p): squared_log_error(t, p)).mean())
+    return rmsle

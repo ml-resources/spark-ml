@@ -6,8 +6,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import bar
 
-from com.sparksamples.util import evaluate
-from com.sparksamples.linearregression.LinearRegressionUtil import get_train_test_data
+from com.sparksamples.decisiontree.DecisionTreeUtil import evaluate_dt
+from com.sparksamples.decisiontree.DecisionTreeUtil import get_train_test_data
 
 
 try:
@@ -26,15 +26,13 @@ def main():
 
 
 def execute():
-    train_data, test_data = get_train_test_data()
-    params = [False, True]
-    metrics = [evaluate(train_data, test_data, 10, 0.1, 1.0, 'l2', param) for param in params]
+    train_data_dt, test_data_dt = get_train_test_data()
+    params = [1, 2, 3, 4, 5, 10, 20]
+    metrics = [evaluate_dt(train_data_dt, test_data_dt, param, 32) for param in params]
     print params
     print metrics
-    bar(params, metrics, color='lightblue')
+    P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
-
-    plt.xscale('log')
 
     P.show()
 

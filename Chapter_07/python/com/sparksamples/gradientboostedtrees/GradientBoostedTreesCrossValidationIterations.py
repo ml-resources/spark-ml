@@ -4,10 +4,11 @@ import sys
 import pylab as P
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import bar
 
-from com.sparksamples.util import evaluate
-from com.sparksamples.linearregression.LinearRegressionUtil import get_train_test_data
+#from com.sparksamples.util import evaluate
+#from com.sparksamples.linearregression.LinearRegressionUtil import get_train_test_data
+from com.sparksamples.gradientboostedtrees.GradientBoostedTreesUtil import get_train_test_data
+from com.sparksamples.gradientboostedtrees.GradientBoostedTreesUtil import evaluate_gbt
 
 
 try:
@@ -27,13 +28,12 @@ def main():
 
 def execute():
     train_data, test_data = get_train_test_data()
-    params = [False, True]
-    metrics = [evaluate(train_data, test_data, 10, 0.1, 1.0, 'l2', param) for param in params]
+    params = [1, 5, 10, 20]
+    metrics = [evaluate_gbt(train_data, test_data, param) for param in params]
     print params
     print metrics
-    bar(params, metrics, color='lightblue')
+    P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
-
     plt.xscale('log')
 
     P.show()

@@ -28,7 +28,6 @@ def main():
     first = records.first()
     records.cache()
 
-
     # extract all the catgorical mappings
     mappings = [get_mapping(records, i) for i in range(2,10)]
     cat_len = sum(map(len, mappings))

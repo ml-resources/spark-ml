@@ -54,10 +54,10 @@ object LinearModelApp{
     val linear_model = LinearRegressionWithSGD.train(data, iterations, step)
     val x = linear_model.predict(data.first().features)
     val true_vs_predicted = data.map(p => (p.label, linear_model.predict(p.features)))
-    val true_vs_predicted_csv = data.map(p => p.label + " ,"  +linear_model.predict(p.features))
+    val true_vs_predicted_csv = data.map(p => p.label + " ,"  + linear_model.predict(p.features))
     val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
     val date = format.format(new java.util.Date())
-    val save = false
+    val save = true
     if (save){
       true_vs_predicted_csv.saveAsTextFile("./output/linear_model_" + date + ".csv")
     }

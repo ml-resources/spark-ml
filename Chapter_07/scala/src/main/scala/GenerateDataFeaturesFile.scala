@@ -1,4 +1,3 @@
-import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 import scala.collection.Map
@@ -14,8 +13,7 @@ object GenerateDataFeaturesFile{
   }
 
   def main(args: Array[String]) {
-    val sc = new SparkContext("local[1]", "First Spark App")
-
+    val sc = Util.sc
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
     val rawData = sc.textFile("../data/hour_noheader.csv")
@@ -45,10 +43,11 @@ object GenerateDataFeaturesFile{
     print("Total feature vector length: " + totalLen)
 
     val data = {
-      records.map(r => Util.extractLabel(r) + "," +  Util.extractAvgFeature(r, catLen, mappings))
+      //records.map(r => Util.extractLabel(r) + "," +  Util.extractAvgFeature(r, catLen, mappings))
+      records.map(r => Util.extractLabel(r) + "," +  r(13))
     }
 
-    val data_collection = data collect()
+    val data_collection = data.collect()
     val d_iterator = data_collection.iterator
     while(d_iterator.hasNext) {
       val x = d_iterator.next

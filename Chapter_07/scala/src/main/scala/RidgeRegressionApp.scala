@@ -1,4 +1,3 @@
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.regression.{LabeledPoint, RidgeRegressionWithSGD}
 import org.apache.spark.rdd.RDD
 
@@ -15,7 +14,8 @@ object RidgeRegressionApp{
   }
 
   def main(args: Array[String]) {
-    val sc = new SparkContext("local[2]", "First Spark App")
+    //val sc = new SparkContext("local[2]", "First Spark App")
+    val sc = Util.sc
 
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
@@ -66,6 +66,6 @@ object RidgeRegressionApp{
     println("Ridge Regression - Mean Squared Error: "  + mse)
     println("Ridge Regression  - Mean Absolute Error: " + mae)
     println("Ridge Regression  - Root Mean Squared Log Error:" + rmsle)
-    sc.stop()
+    //sc.stop()
   }
 }

@@ -1,11 +1,8 @@
-import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.regression.IsotonicRegression
+import org.apache.spark.mllib.regression.{IsotonicRegression, LabeledPoint}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
-
 /**
  * A simple Spark app in Scala
  */
@@ -16,12 +13,15 @@ object IsotonicRegressionApp{
   }
 
   def main(args: Array[String]) {
-    val conf = new SparkConf().setMaster("local").setAppName("GradientBoostedTreesRegressionApp")
-    val sc = new SparkContext(conf)
+    val sc = Util.sc
+    //val conf = (new SparkConf).setMaster("local[1]").setAppName("SparkApp").
+    //  set("spark.driver.allowMultipleContexts", "true")
+    //val sc = new SparkContext(conf)
+
 
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
-    val rawData = sc.textFile("../data/hour_noheader.csv")
+    val rawData = sc.textFile("../data/hour_noheader_1000.csv")
     val numData = rawData.count()
     val records = rawData.map(line => line.split(","))
     records.cache()
@@ -46,29 +46,30 @@ object IsotonicRegressionApp{
       (Util.extractLabel(r), Util.extractAvgFeature(r, catLen, mappings), 1.0)
     }
 
-
     val iterations = 10
     val step = 0.1
     val intercept =false
 
-    val x = new IsotonicRegression().setIsotonic(true)
+    val x = new IsotonicRegression().setIsotonic(false)
     val model = x.run(parsedData)
 
     val parsedData1: RDD[Double] = parsedData.map(r => r._2)
     //val model = GradientBoostedTrees.train(data, boostingStrategy)
-    val true_vs_predicted = parsedData1.map(p => (p, model.predict(p)))
-    //val true_vs_predicted = data.map(p => (p.label, model.predict(parsedData1)))
-    val true_vs_predicted_take5 = true_vs_predicted.take(5)
-    for(i <- 0 until 4) {
-      println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
+    val true_vs_predicted = parsedData.map(p => (p._1, model.predict(p._2)))
+
+    val save = true
+    if(save){
+      val true_vs_predicted_csv = parsedData.map(p => ( p._1+ "," + model.predict(p._2)))
+      val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
+      val date = format.format(new java.util.Date())
+      true_vs_predicted_csv.saveAsTextFile("./output/isotonic_regression_" + date + ".csv")
     }
+
     val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
     val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
 
-    println("Isotonic Regression - Mean Squared Error: "  + mse)
-    println("Isotonic Regression  - Mean Absolute Error: " + mae)
-    println("Isotonic Regression  - Root Mean Squared Log Error:" + rmsle)
-    sc.stop()
+    println("completed")
+
   }
 }

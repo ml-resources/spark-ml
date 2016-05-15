@@ -6,7 +6,8 @@ import org.apache.spark.{SparkConf, SparkContext}
   */
 object Util {
   val PATH= "../data/hour_noheader.csv"
-  val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
+  val spConfig = (new SparkConf).setMaster("local[1]").setAppName("SparkApp").
+    set("spark.driver.allowMultipleContexts", "true")
   val sc = new SparkContext(spConfig)
 
   def getRecords() : (RDD[Array[String]],Long) ={
@@ -71,27 +72,12 @@ object Util {
     var cat_array = Array[Double](cat_len)
     var idx = 0
     val record_2 = record.slice(2,14)
-    /*for(field <- 2 until 14){
-
-      try {
-          val x = record(field).toDouble
-          cat_array(idx) = x
-          idx += 1
-
-      }catch {
-        case e: Exception => print(e)
-      }*/
 
 
     return Vectors.dense(record_2.map(x => x.toDouble))
 
   }
-  /*
-  def extract_features_dt(record):
-    x = np.array(map(float, record[2:14]))
-    return np.array(map(float, record[2:14]))
-   */
-    //return np.array(map(float, record[2:14]))
+
   def extractAvgFeature(record : Array[String], cat_len: Int,
                       mappings:scala.collection.immutable.List[scala.collection.Map[String,Long]]): Double ={
     //var cat_vec = Vectors.zeros(cat_len)
@@ -172,14 +158,4 @@ object Util {
   def squaredLogError(actual:Double, pred : Double) : Double = {
     return Math.pow( (Math.log(pred +1) - Math.log(actual +1)), 2.0)
   }
-/*
-def squared_error(actual, pred):
-    return (pred - actual)**2
-
-def abs_error(actual, pred):
-    return np.abs(pred - actual)
-
-def squared_log_error(pred, actual):
-    return (np.log(pred + 1) - np.log(actual + 1))**2
- */
 }

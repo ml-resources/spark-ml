@@ -1,4 +1,3 @@
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.DecisionTree
 import org.apache.spark.rdd.RDD
@@ -17,7 +16,8 @@ object DecisionTreeCategoricalFeaturesApp{
 
   def main(args: Array[String]) {
     val save = true
-    val sc = new SparkContext("local[2]", "First Spark App")
+    //val sc = new SparkContext("local[2]", "First Spark App")
+    val sc = Util.sc
 
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
@@ -87,7 +87,7 @@ object DecisionTreeCategoricalFeaturesApp{
     val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
     val date = format.format(new java.util.Date())
     if (save){
-      true_vs_predicted_csv.saveAsTextFile("./output/decision_tree_" + date + ".csv")
+      true_vs_predicted_csv.saveAsTextFile("./output/decision_tree_categorical_" + date + ".csv")
     }
 
     print("Decision Tree depth: " + decisionTreeModel.depth)

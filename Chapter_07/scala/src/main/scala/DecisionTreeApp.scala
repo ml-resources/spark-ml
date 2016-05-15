@@ -1,4 +1,3 @@
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.DecisionTree
 import org.apache.spark.rdd.RDD
@@ -16,8 +15,8 @@ object DecisionTreeApp{
   }
 
   def main(args: Array[String]) {
-    val save = true
-    val sc = new SparkContext("local[2]", "First Spark App")
+    val save = false
+    val sc = Util.sc
 
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
@@ -67,24 +66,13 @@ object DecisionTreeApp{
     val preds = decisionTreeModel.predict(data_dt.map( p=> p.features))
     val actual = data.map( p=> p.label)
     val true_vs_predicted_dt = actual.zip(preds)
-    val true_vs_predicted_csv = data.map(p => p.label + " ,"  + decisionTreeModel.predict(p.features))
-
-    val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
-    val date = format.format(new java.util.Date())
-    if (save){
+    if(save){
+      val true_vs_predicted_csv = data.map(p => p.label + " ,"  + decisionTreeModel.predict(p.features))
+      val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
+      val date = format.format(new java.util.Date())
       true_vs_predicted_csv.saveAsTextFile("./output/decision_tree_" + date + ".csv")
     }
-    //val true_vs_predicted_dt = data_dt.map(p => (p.label, decisionTreeModel.predict(p.features)))
-    /*val true_vs_predicted_dt_take5 = true_vs_predicted_dt.take(5)
-    for(i <- 0 until 4) {
-      println("True vs Predicted: " + "i :" + true_vs_predicted_dt_take5(i))
-    }*/
-    /*
-    dt_model = DecisionTree.trainRegressor(data_dt, {})
-    preds = dt_model.predict(data_dt.map(lambda p: p.features))
-    actual = data.map(lambda p: p.label)
-     true_vs_predicted_dt = actual.zip(preds)
-     */
+
     print("Decision Tree depth: " + decisionTreeModel.depth)
     print("Decision Tree number of nodes: " + decisionTreeModel.numNodes)
     val mse = true_vs_predicted_dt.map{ case(t, p) => Util.squaredError(t, p)}.mean()
@@ -94,7 +82,7 @@ object DecisionTreeApp{
     println("Decision Tree Model - Mean Squared Error: "  + mse)
     println("Decision Tree - Mean Absolute Error: " + mae)
     println("Decision Tree Model - Root Mean Squared Log Error:" + rmsle)
-    sc.stop()
+    Util.sc.stop()
   }
 
 }

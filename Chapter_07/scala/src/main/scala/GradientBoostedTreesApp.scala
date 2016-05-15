@@ -2,7 +2,6 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.GradientBoostedTrees
 import org.apache.spark.mllib.tree.configuration.BoostingStrategy
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
@@ -17,8 +16,8 @@ object GradientBoostedTreesApp{
   }
 
   def main(args: Array[String]) {
-    val conf = new SparkConf().setMaster("local").setAppName("GradientBoostedTreesRegressionApp")
-    val sc = new SparkContext(conf)
+    //val conf = new SparkConf().setMaster("local").setAppName("GradientBoostedTreesRegressionApp")
+    val sc = Util.sc
 
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
@@ -67,6 +66,13 @@ object GradientBoostedTreesApp{
     for(i <- 0 until 4) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
     }
+    val save = true
+    if(save){
+      val true_vs_predicted_csv = data.map(p => p.label + " ,"  + model.predict(p.features))
+      val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
+      val date = format.format(new java.util.Date())
+      true_vs_predicted_csv.saveAsTextFile("./output/gradient_boosted_trees_" + date + ".csv")
+    }
     val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
     val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
@@ -74,6 +80,6 @@ object GradientBoostedTreesApp{
     println("Gradient Boosted Trees - Mean Squared Error: "  + mse)
     println("Gradient Boosted Trees - Mean Absolute Error: " + mae)
     println("Gradient Boosted Trees - Root Mean Squared Log Error:" + rmsle)
-    sc.stop()
+    //sc.stop()
   }
 }

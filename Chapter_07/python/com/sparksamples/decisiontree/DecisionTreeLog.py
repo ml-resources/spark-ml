@@ -1,17 +1,17 @@
 import os
 import sys
-from util import get_mapping
-from util import extract_features
-from util import extract_label
-from util import extract_features_dt
-from util import squared_error
-from util import abs_error
-from util import squared_log_error
-from util import path
-from pyspark.mllib.regression import LabeledPoint
-
-from pyspark.mllib.tree import DecisionTree
 import numpy as np
+
+from pyspark.mllib.regression import LabeledPoint
+from pyspark.mllib.tree import DecisionTree
+
+from com.sparksamples.util import get_mapping
+from com.sparksamples.util import extract_features
+from com.sparksamples.util import extract_label
+from com.sparksamples.util import extract_features_dt
+from com.sparksamples.util import get_records
+from com.sparksamples.util import calculate_print_metrics
+
 
 os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"
 sys.path.append("/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6//python")
@@ -24,10 +24,7 @@ except ImportError as e:
     sys.exit(1)
 
 def main():
-    sc = SparkContext(appName="PythonApp")
-    raw_data = sc.textFile(path)
-    num_data = raw_data.count()
-    records = raw_data.map(lambda x: x.split(","))
+    records = get_records()
     first = records.first()
     records.cache()
 
@@ -43,8 +40,8 @@ def main():
     print "Total feature vector length: %d" % total_len
 
     data = records.map(lambda r: LabeledPoint(extract_label(r), extract_features(r, cat_len, mappings)))
-
     data_dt = records.map(lambda r: LabeledPoint(extract_label(r), extract_features_dt(r)))
+
     first_point_dt = data_dt.first()
     print "Decision Tree feature vector: " + str(first_point_dt.features)
     print "Decision Tree feature vector length: " + str(len(first_point_dt.features))
@@ -53,17 +50,16 @@ def main():
     preds = dt_model.predict(data_dt.map(lambda p: p.features))
     actual = data.map(lambda p: p.label)
     true_vs_predicted_dt = actual.zip(preds)
-    print "Decision Tree predictions: " + str(true_vs_predicted_dt.take(5))
-    print "Decision Tree depth: " + str(dt_model.depth())
-    print "Decision Tree number of nodes: " + str(dt_model.numNodes())
 
+    data_dt_log = data_dt.map(lambda lp: LabeledPoint(np.log(lp.label), lp.features))
+    dt_model_log = DecisionTree.trainRegressor(data_dt_log, {})
 
-    mse_dt = true_vs_predicted_dt.map(lambda (t, p): squared_error(t, p)).mean()
-    mae_dt = true_vs_predicted_dt.map(lambda (t, p): abs_error(t, p)).mean()
-    rmsle_dt = np.sqrt(true_vs_predicted_dt.map(lambda (t, p): squared_log_error(t, p)).mean())
-    print "Decision Tree - Mean Squared Error: %2.4f" % mse_dt
-    print "Decision Tree - Mean Absolute Error: %2.4f" % mae_dt
-    print "Decision Tree - Root Mean Squared Log Error: %2.4f" % rmsle_dt
+    preds_log = dt_model_log.predict(data_dt_log.map(lambda p: p.features))
+    actual_log = data_dt_log.map(lambda p: p.label)
+    true_vs_predicted_dt_log = actual_log.zip(preds_log).map(lambda (t, p): (np.exp(t), np.exp(p)))
+
+    calculate_print_metrics("Decision Tree Log", true_vs_predicted_dt_log)
+
 
 if __name__ == "__main__":
     main()

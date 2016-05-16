@@ -1,3 +1,5 @@
+package org.sparksamples
+
 import org.apache.spark.rdd.RDD
 
 import scala.collection.Map

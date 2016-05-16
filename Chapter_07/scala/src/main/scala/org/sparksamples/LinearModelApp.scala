@@ -1,29 +1,31 @@
-import org.apache.spark.mllib.regression.{LabeledPoint, RidgeRegressionWithSGD}
+package org.sparksamples
+
+import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
 import org.apache.spark.rdd.RDD
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
 
 /**
- * A simple Spark app in Scala
- */
-object RidgeRegressionApp{
+  * LogisticalRegression App
+  * @author Rajdeep Dua
+  */
+object LinearModelApp{
 
   def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
     return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
   }
 
   def main(args: Array[String]) {
-    //val sc = new SparkContext("local[2]", "First Spark App")
-    val sc = Util.sc
 
-    // we take the raw data in CSV format and convert it into a set of records
-    // of the form (user, product, price)
-    val rawData = sc.textFile("../data/hour_noheader.csv")
-    val numData = rawData.count()
-    val records = rawData.map(line => line.split(","))
+    val recordsArray = Util.getRecords()
+    val records = recordsArray._1
+    val first = records.first()
+    val numData = recordsArray._2
+
+    println(numData.toString())
     records.cache()
-    //print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
+    print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
     var list = new ListBuffer[Map[String, Long]]()
     for( i <- 2 to 9){
       val m = get_mapping(records, i)
@@ -48,13 +50,19 @@ object RidgeRegressionApp{
     println("Linear Model feature vector length: " + first_point.features.size)
 
     val iterations = 10
-    val step = 0.1
-    val intercept =false
-    val rr = new RidgeRegressionWithSGD()
-    rr.optimizer.setNumIterations(100)
-    rr.optimizer.setStepSize(0.1)
-    val rrModel = rr.run(data)
-    val true_vs_predicted = data.map(p => (p.label, rrModel.predict(p.features)))
+    val step = 0.2
+    val intercept =true
+
+    val linear_model = LinearRegressionWithSGD.train(data, iterations, step)
+    val x = linear_model.predict(data.first().features)
+    val true_vs_predicted = data.map(p => (p.label, linear_model.predict(p.features)))
+    val true_vs_predicted_csv = data.map(p => p.label + " ,"  + linear_model.predict(p.features))
+    val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
+    val date = format.format(new java.util.Date())
+    val save = true
+    if (save){
+      true_vs_predicted_csv.saveAsTextFile("./output/linear_model_" + date + ".csv")
+    }
     val true_vs_predicted_take5 = true_vs_predicted.take(5)
     for(i <- 0 until 4) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
@@ -63,9 +71,10 @@ object RidgeRegressionApp{
     val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
 
-    println("Ridge Regression - Mean Squared Error: "  + mse)
-    println("Ridge Regression  - Mean Absolute Error: " + mae)
-    println("Ridge Regression  - Root Mean Squared Log Error:" + rmsle)
-    //sc.stop()
+    println("Linear Model - Mean Squared Error: "  + mse)
+    println("Linear Model - Mean Absolute Error: " + mae)
+    println("Linear Model - Root Mean Squared Log Error:" + rmsle)
+
   }
+
 }

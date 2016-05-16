@@ -1,3 +1,5 @@
+package org.sparksamples
+
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.DecisionTree
 import org.apache.spark.rdd.RDD
@@ -8,15 +10,14 @@ import scala.collection.mutable.ListBuffer
 /**
  * A simple Spark app in Scala
  */
-object DecisionTreeCategoricalFeaturesApp{
+object DecisionTreeApp{
 
   def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
     return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
   }
 
   def main(args: Array[String]) {
-    val save = true
-    //val sc = new SparkContext("local[2]", "First Spark App")
+    val save = false
     val sc = Util.sc
 
     // we take the raw data in CSV format and convert it into a set of records
@@ -56,38 +57,22 @@ object DecisionTreeCategoricalFeaturesApp{
     println("Decision Tree feature vector:" + first_point.features.toString)
     println("Decision Tree feature vector length: " + first_point.features.size)
 
-
-    def getCatFeatures(): scala.Predef.Map[Int, Int] = {
-
-      var d = scala.Predef.Map[Int, Int]()
-
-      for(a <- 2 until 10){
-        d += (a-2 -> (get_mapping(records, a).size + 1))
-        //d.put(a-2,get_mapping(records, a).size + 1)
-      }
-      return d
-
-    }
-    val cat_features = getCatFeatures()
-    //dict([(i - 2, len(get_mapping(records, i)) + 1) for i in range(2,10)])
-
-    //val categoricalFeaturesInfo = scala.Predef.Map[Int, Int]()
+    val categoricalFeaturesInfo = scala.Predef.Map[Int, Int]()
     val impurity = "variance"
     val maxDepth = 5
     val maxBins = 32
-    val decisionTreeModel= DecisionTree.trainRegressor(data_dt, cat_features,  impurity, maxDepth, maxBins)
-    //val decisionTreeModel = DecisionTree.trainRegressor(data_dt, categoricalFeaturesInfo,
-    //  impurity, maxDepth, maxBins )
+
+    val decisionTreeModel = DecisionTree.trainRegressor(data_dt, categoricalFeaturesInfo,
+      impurity, maxDepth, maxBins )
 
     val preds = decisionTreeModel.predict(data_dt.map( p=> p.features))
     val actual = data.map( p=> p.label)
     val true_vs_predicted_dt = actual.zip(preds)
-    val true_vs_predicted_csv = data.map(p => p.label + " ,"  + decisionTreeModel.predict(p.features))
-
-    val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
-    val date = format.format(new java.util.Date())
-    if (save){
-      true_vs_predicted_csv.saveAsTextFile("./output/decision_tree_categorical_" + date + ".csv")
+    if(save){
+      val true_vs_predicted_csv = data.map(p => p.label + " ,"  + decisionTreeModel.predict(p.features))
+      val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
+      val date = format.format(new java.util.Date())
+      true_vs_predicted_csv.saveAsTextFile("./output/decision_tree_" + date + ".csv")
     }
 
     print("Decision Tree depth: " + decisionTreeModel.depth)
@@ -99,7 +84,7 @@ object DecisionTreeCategoricalFeaturesApp{
     println("Decision Tree Model - Mean Squared Error: "  + mse)
     println("Decision Tree - Mean Absolute Error: " + mae)
     println("Decision Tree Model - Root Mean Squared Log Error:" + rmsle)
-    sc.stop()
+    Util.sc.stop()
   }
 
 }

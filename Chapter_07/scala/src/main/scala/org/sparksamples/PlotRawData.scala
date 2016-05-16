@@ -1,11 +1,14 @@
+package org.sparksamples
+
 //import org.sparksamples.Util
 
 //import _root_.scalax.chart.ChartFactories
 import java.awt.Font
 
+import org.jfree.chart.axis.CategoryLabelPositions
+
 import scala.collection.immutable.ListMap
 import scalax.chart.module.ChartFactories
-import org.jfree.chart.axis.CategoryLabelPositions
 
 /**
   * @author Rajdeep Dua

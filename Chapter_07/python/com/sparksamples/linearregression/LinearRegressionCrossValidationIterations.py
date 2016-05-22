@@ -33,7 +33,9 @@ def execute():
     P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
     plt.xscale('log')
-
+    plt.title("LinearRegressionWithSGD : Iterations")
+    plt.xlabel("Iterators")
+    plt.ylabel("RMSLE")
     P.show()
 
 

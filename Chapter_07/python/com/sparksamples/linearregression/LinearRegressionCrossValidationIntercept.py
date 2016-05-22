@@ -27,14 +27,18 @@ def main():
 
 def execute():
     train_data, test_data = get_train_test_data()
+    xticks = ["False", "True"]
     params = [False, True]
+    x = [0,1]
     metrics = [evaluate(train_data, test_data, 10, 0.1, 1.0, 'l2', param) for param in params]
+    #metrics = [1.4064367998474196, 1.4358305401660159]
     print params
     print metrics
-    bar(params, metrics, color='lightblue')
-    fig = matplotlib.pyplot.gcf()
-
-    plt.xscale('log')
+    P.plot(x, metrics)
+    P.xticks(params,xticks)
+    plt.title("LinearRegressionWithSGD : Intercept")
+    plt.xlabel("Intercept Boolean")
+    plt.ylabel("RMSLE")
 
     P.show()
 

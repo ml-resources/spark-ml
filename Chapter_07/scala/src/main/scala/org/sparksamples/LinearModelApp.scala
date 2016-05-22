@@ -1,7 +1,7 @@
 package org.sparksamples
 
 import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
-import org.apache.spark.rdd.RDD
+import org.sparksamples.linearregression.LinearRegressionUtil
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
@@ -12,9 +12,7 @@ import scala.collection.mutable.ListBuffer
   */
 object LinearModelApp{
 
-  def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
-    return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
-  }
+
 
   def main(args: Array[String]) {
 
@@ -25,10 +23,10 @@ object LinearModelApp{
 
     println(numData.toString())
     records.cache()
-    print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
+    print("Mapping of first categorical feature column: " +  LinearRegressionUtil.get_mapping(records, 2))
     var list = new ListBuffer[Map[String, Long]]()
     for( i <- 2 to 9){
-      val m = get_mapping(records, i)
+      val m =  LinearRegressionUtil.get_mapping(records, i)
       list += m
     }
     val mappings = list.toList
@@ -50,9 +48,11 @@ object LinearModelApp{
     println("Linear Model feature vector length: " + first_point.features.size)
 
     val iterations = 10
-    val step = 0.2
+    //val step = 0.2
+    val step = 0.025
     val intercept =true
 
+    //LinearRegressionWithSGD.tr
     val linear_model = LinearRegressionWithSGD.train(data, iterations, step)
     val x = linear_model.predict(data.first().features)
     val true_vs_predicted = data.map(p => (p.label, linear_model.predict(p.features)))

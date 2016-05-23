@@ -7,7 +7,7 @@ import org.jfree.ui.RefineryUtilities
   * LogisticalRegression App
   * @author Rajdeep Dua
   */
-object LinearRegressionCrossValidationStep{
+object LinearRegressionCrossValidationIterations{
 
   
   def main(args: Array[String]) {
@@ -16,24 +16,28 @@ object LinearRegressionCrossValidationStep{
     val train_data = data._1
     val test_data = data._2
     val iterations = 10
-    val steps_param = Array(0.01, 0.025, 0.05, 0.1, 1.0)
+    //LinearRegressionCrossValidationStep$
+    //params = [1, 5, 10, 20, 50, 100, 200]
+    val iterations_param = Array(1, 5, 10, 20, 50, 100, 200)
+    val step =0.01
+    //val steps_param = Array(0.01, 0.025, 0.05, 0.1, 1.0)
     val intercept =false
 
     val i = 0
     val results = new Array[String](5)
     val resultsMap = new scala.collection.mutable.HashMap[String, String]
     val dataset = new DefaultCategoryDataset()
-    for(i <- 0 until steps_param.length) {
-      val step = steps_param(i)
-      val rmsle = LinearRegressionUtil.evaluate(train_data, test_data,iterations,step,intercept)
+    for(i <- 0 until iterations_param.length) {
+      val iteration = iterations_param(i)
+      val rmsle = LinearRegressionUtil.evaluate(train_data, test_data,iteration,step,intercept)
       //results(i) = step + ":" + rmsle
-      resultsMap.put(step.toString,rmsle.toString)
-      dataset.addValue(rmsle, "RMSLE", step)
+      resultsMap.put(iteration.toString,rmsle.toString)
+      dataset.addValue(rmsle, "RMSLE", iteration)
     }
     val chart = new LineChart(
-      "Steps" ,
-      "LinearRegressionWithSGD : RMSLE vs Steps")
-    chart.exec("Steps","RMSLE",dataset)
+      "Iterations" ,
+      "LinearRegressionWithSGD : RMSLE vs Iterations")
+    chart.exec("Iterations","RMSLE",dataset)
     chart.pack( )
     RefineryUtilities.centerFrameOnScreen( chart )
     chart.setVisible( true )

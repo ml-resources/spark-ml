@@ -27,8 +27,6 @@ def main():
 
 def execute():
     train_data_dt, test_data_dt = get_train_test_data()
-    #params = [1, 2, 3, 4, 5, 10, 20]
-    #metrics = [evaluate_dt(train_data_dt, test_data_dt, param, 32) for param in params]
     params = [2, 4, 8, 16, 32, 64, 100]
     metrics = [evaluate_dt(train_data_dt, test_data_dt, 5, param) for param in params]
     print params

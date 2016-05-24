@@ -32,6 +32,9 @@ def execute():
     print metrics
     P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
+    plt.title("LinearRegressionWithSGD : L1 Regularization")
+    plt.xlabel("Value")
+    plt.ylabel("RMSLE")
     plt.xscale('log')
     P.show()
 

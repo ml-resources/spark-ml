@@ -1,6 +1,9 @@
+package org.sparksamples.decisiontree
+
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.DecisionTree
 import org.apache.spark.rdd.RDD
+import org.sparksamples.Util
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer

@@ -1,3 +1,5 @@
+package org.sparksamples
+
 import org.apache.spark.mllib.regression.{IsotonicRegression, LabeledPoint}
 import org.apache.spark.rdd.RDD
 

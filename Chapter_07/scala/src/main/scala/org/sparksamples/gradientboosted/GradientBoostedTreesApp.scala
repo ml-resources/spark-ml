@@ -1,5 +1,10 @@
-import org.apache.spark.mllib.regression.{LabeledPoint, RidgeRegressionWithSGD}
+package org.sparksamples.gradientboosted
+
+import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.mllib.tree.GradientBoostedTrees
+import org.apache.spark.mllib.tree.configuration.BoostingStrategy
 import org.apache.spark.rdd.RDD
+import org.sparksamples.Util
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
@@ -7,14 +12,14 @@ import scala.collection.mutable.ListBuffer
 /**
  * A simple Spark app in Scala
  */
-object RidgeRegressionApp{
+object GradientBoostedTreesApp{
 
   def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
     return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
   }
 
   def main(args: Array[String]) {
-    //val sc = new SparkContext("local[2]", "First Spark App")
+    //val conf = new SparkConf().setMaster("local").setAppName("GradientBoostedTreesRegressionApp")
     val sc = Util.sc
 
     // we take the raw data in CSV format and convert it into a set of records
@@ -23,7 +28,6 @@ object RidgeRegressionApp{
     val numData = rawData.count()
     val records = rawData.map(line => line.split(","))
     records.cache()
-    //print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
     var list = new ListBuffer[Map[String, Long]]()
     for( i <- 2 to 9){
       val m = get_mapping(records, i)
@@ -44,28 +48,37 @@ object RidgeRegressionApp{
       records.map(r => LabeledPoint(Util.extractLabel(r), Util.extractFeatures(r, catLen, mappings)))
     }
     val first_point = data.first()
-    println("Linear Model feature vector:" + first_point.features.toString)
-    println("Linear Model feature vector length: " + first_point.features.size)
+    println("Gradient Boosted Trees Model feature vector:" + first_point.features.toString)
+    println("Gradient Boosted Trees Model feature vector length: " + first_point.features.size)
 
-    val iterations = 10
-    val step = 0.1
-    val intercept =false
-    val rr = new RidgeRegressionWithSGD()
-    rr.optimizer.setNumIterations(100)
-    rr.optimizer.setStepSize(0.1)
-    val rrModel = rr.run(data)
-    val true_vs_predicted = data.map(p => (p.label, rrModel.predict(p.features)))
+
+    var boostingStrategy = BoostingStrategy.defaultParams("Regression")
+    //boostingStrategy.numIterations = 3 // Note: Use more iterations in practice.
+    //boostingStrategy.treeStrategy.maxDepth = 5
+    boostingStrategy.setNumIterations(3)// Note: Use more iterations in practice.
+    boostingStrategy.treeStrategy.setMaxDepth(5)
+
+
+    val model = GradientBoostedTrees.train(data, boostingStrategy)
+    val true_vs_predicted = data.map(p => (p.label, model.predict(p.features)))
     val true_vs_predicted_take5 = true_vs_predicted.take(5)
     for(i <- 0 until 4) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
+    }
+    val save = true
+    if(save){
+      val true_vs_predicted_csv = data.map(p => p.label + " ,"  + model.predict(p.features))
+      val format = new java.text.SimpleDateFormat("dd-MM-yyyy-hh-mm-ss")
+      val date = format.format(new java.util.Date())
+      true_vs_predicted_csv.saveAsTextFile("./output/gradient_boosted_trees_" + date + ".csv")
     }
     val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
     val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
 
-    println("Ridge Regression - Mean Squared Error: "  + mse)
-    println("Ridge Regression  - Mean Absolute Error: " + mae)
-    println("Ridge Regression  - Root Mean Squared Log Error:" + rmsle)
+    println("Gradient Boosted Trees - Mean Squared Error: "  + mse)
+    println("Gradient Boosted Trees - Mean Absolute Error: " + mae)
+    println("Gradient Boosted Trees - Root Mean Squared Log Error:" + rmsle)
     //sc.stop()
   }
 }

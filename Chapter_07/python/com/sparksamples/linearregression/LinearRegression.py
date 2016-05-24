@@ -1,5 +1,5 @@
 import sys
-
+import os
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.regression import LinearRegressionWithSGD
 
@@ -9,7 +9,8 @@ from com.sparksamples.util import extract_label
 from com.sparksamples.util import get_records
 from com.sparksamples.util import calculate_print_metrics
 
-
+os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6/"
+sys.path.append("/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6//python")
 try:
     from pyspark import SparkContext
     from pyspark import SparkConf
@@ -38,7 +39,10 @@ def main():
     print "Linear Model feature vector:\n" + str(first_point.features)
     print "Linear Model feature vector length: " + str(len(first_point.features))
 
-    linear_model = LinearRegressionWithSGD.train(data, iterations=10, step=0.1, intercept=False)
+    #linear_model = LinearRegressionWithSGD.train(data, iterations=10, step=0.1, intercept=False)
+    linear_model = LinearRegressionWithSGD.train(data, iterations=10, step=0.025, regParam=0.0, regType=None,
+                                  intercept=False)
+
     true_vs_predicted = data.map(lambda p: (p.label, linear_model.predict(p.features)))
     print "Linear Model predictions: " + str(true_vs_predicted.take(5))
 

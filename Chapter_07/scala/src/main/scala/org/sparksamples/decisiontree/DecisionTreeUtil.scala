@@ -21,10 +21,10 @@ object DecisionTreeUtil {
 
     println(numData.toString())
     records.cache()
-    print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
+    print("Mapping of first categorical feature column: " +  Util.get_mapping(records, 2))
     var list = new ListBuffer[Map[String, Long]]()
     for( i <- 2 to 9){
-      val m = get_mapping(records, i)
+      val m = Util.get_mapping(records, i)
       list += m
     }
     val mappings = list.toList
@@ -46,12 +46,6 @@ object DecisionTreeUtil {
     val test = splits(1)
     return (training, test)
   }
-
-  def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
-    return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
-  }
-
-
 
   def evaluate(train: RDD[LabeledPoint],test: RDD[LabeledPoint],
                categoricalFeaturesInfo: scala.Predef.Map[Int, Int],

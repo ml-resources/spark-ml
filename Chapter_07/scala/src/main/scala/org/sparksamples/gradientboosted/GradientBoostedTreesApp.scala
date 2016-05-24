@@ -1,9 +1,10 @@
-package org.sparksamples
+package org.sparksamples.gradientboosted
 
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.GradientBoostedTrees
 import org.apache.spark.mllib.tree.configuration.BoostingStrategy
 import org.apache.spark.rdd.RDD
+import org.sparksamples.Util
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
@@ -50,9 +51,6 @@ object GradientBoostedTreesApp{
     println("Gradient Boosted Trees Model feature vector:" + first_point.features.toString)
     println("Gradient Boosted Trees Model feature vector length: " + first_point.features.size)
 
-    val iterations = 10
-    val step = 0.1
-    val intercept =false
 
     var boostingStrategy = BoostingStrategy.defaultParams("Regression")
     //boostingStrategy.numIterations = 3 // Note: Use more iterations in practice.
@@ -60,7 +58,6 @@ object GradientBoostedTreesApp{
     boostingStrategy.setNumIterations(3)// Note: Use more iterations in practice.
     boostingStrategy.treeStrategy.setMaxDepth(5)
 
-    //boostingStrategy.treeStrategy.setCategoricalFeaturesInfo(scala.Predef.Map[Int, Int]())
 
     val model = GradientBoostedTrees.train(data, boostingStrategy)
     val true_vs_predicted = data.map(p => (p.label, model.predict(p.features)))

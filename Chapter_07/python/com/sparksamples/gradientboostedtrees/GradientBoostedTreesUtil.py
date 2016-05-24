@@ -14,12 +14,7 @@ __author__ = 'Rajdeep Dua'
 
 
 def evaluate_gbt(train, test,numItr):
-    #model = DecisionTree.trainRegressor(train, {}, impurity='variance', maxDepth=maxDepth, maxBins=maxBins)
-    #preds = model.predict(test.map(lambda p: p.features))
-    #actual = test.map(lambda p: p.label)
-    #tp = actual.zip(preds)
     gbt_model = GradientBoostedTrees.trainRegressor(train,categoricalFeaturesInfo={}, numIterations=numItr)
-    #true_vs_predicted_gbt = test.map(lambda p: (p.label, gbt_model.predict(p.features)))
 
     predictions = gbt_model.predict(test.map(lambda x: x.features))
     tp = test.map(lambda lp: lp.label).zip(predictions)

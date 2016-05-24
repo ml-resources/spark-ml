@@ -1,7 +1,6 @@
 package org.sparksamples
 
 import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
-import org.sparksamples.linearregression.LinearRegressionUtil
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
@@ -23,10 +22,10 @@ object LinearModelApp{
 
     println(numData.toString())
     records.cache()
-    print("Mapping of first categorical feature column: " +  LinearRegressionUtil.get_mapping(records, 2))
+    print("Mapping of first categorical feature column: " +  Util.get_mapping(records, 2))
     var list = new ListBuffer[Map[String, Long]]()
     for( i <- 2 to 9){
-      val m =  LinearRegressionUtil.get_mapping(records, i)
+      val m =  Util.get_mapping(records, i)
       list += m
     }
     val mappings = list.toList

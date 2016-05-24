@@ -2,7 +2,7 @@ package org.sparksamples.decisiontree
 
 import org.jfree.data.category.DefaultCategoryDataset
 import org.jfree.ui.RefineryUtilities
-import org.sparksamples.linearregression.LineChart
+import org.sparksamples.chart.LineChart
 
 /**
   * LogisticalRegression App

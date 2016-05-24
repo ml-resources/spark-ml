@@ -19,10 +19,10 @@ object LinearRegressionUtil {
 
     println(numData.toString())
     records.cache()
-    print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
+    print("Mapping of first categorical feature column: " +  Util.get_mapping(records, 2))
     var list = new ListBuffer[Map[String, Long]]()
     for( i <- 2 to 9){
-      val m = get_mapping(records, i)
+      val m = Util.get_mapping(records, i)
       list += m
     }
     val mappings = list.toList
@@ -42,10 +42,6 @@ object LinearRegressionUtil {
     return (training, test)
   }
 
-  def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
-    return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
-  }
-
 
   /*def evaluate(train, test, iterations, step, regParam, regType, intercept):
   model = LinearRegressionWithSGD.train(train, iterations, step, regParam=regParam, regType=regType, intercept=intercept)
@@ -60,7 +56,6 @@ object LinearRegressionUtil {
     linReg.optimizer.setNumIterations(iterations).setStepSize(step)
     val linear_model = linReg.run(train)
 
-    //val linear_model =  LinearRegressionWithSGD.train(train, iterations,step)
     val true_vs_predicted = test.map(p => (p.label, linear_model.predict(p.features)))
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
     return rmsle

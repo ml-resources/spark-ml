@@ -3,6 +3,9 @@ package org.sparksamples
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
+
+import scala.collection.Map
+
 /**
   * Created by rajdeep dua on 4/15/16.
   */
@@ -160,4 +163,9 @@ object Util {
   def squaredLogError(actual:Double, pred : Double) : Double = {
     return Math.pow( (Math.log(pred +1) - Math.log(actual +1)), 2.0)
   }
+
+  def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
+    return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
+  }
+
 }

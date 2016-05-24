@@ -1,10 +1,9 @@
-package org.sparksamples.linearregression
+package org.sparksamples.chart
 
-import org.jfree.chart.plot.PlotOrientation
-import org.jfree.chart.{JFreeChart, ChartFactory, ChartPanel}
+import org.jfree.chart.plot.{CategoryPlot, PlotOrientation}
+import org.jfree.chart.{ChartFactory, ChartPanel, JFreeChart}
 import org.jfree.data.category.{CategoryDataset, DefaultCategoryDataset}
 import org.jfree.ui.{ApplicationFrame, RefineryUtilities}
-import org.jfree.chart.plot.CategoryPlot
 
 class LineChart(applicationTitle: String, chartTitle: String) extends ApplicationFrame(applicationTitle) {
   //categoryAxisLabel - the label for the category axis (null permitted).

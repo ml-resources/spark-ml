@@ -168,4 +168,14 @@ object Util {
     return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
   }
 
+  def calculatePrintMetrics(true_vs_predicted: RDD[(Double, Double)], algo: String) = {
+    val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
+    val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
+    val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
+
+    println(algo + " - Mean Squared Error: "  + mse)
+    println(algo + " - Mean Absolute Error: " + mae)
+    println(algo + " - Root Mean Squared Log Error:" + rmsle)
+  }
+
 }

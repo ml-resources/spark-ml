@@ -53,12 +53,12 @@ object RidgeRegressionApp{
     val step = 0.1
     val intercept =false
     val rr = new RidgeRegressionWithSGD()
-    rr.optimizer.setNumIterations(100)
+    rr.optimizer.setNumIterations(iterations)
     rr.optimizer.setStepSize(0.1)
     val rrModel = rr.run(data)
     val true_vs_predicted = data.map(p => (p.label, rrModel.predict(p.features)))
     val true_vs_predicted_take5 = true_vs_predicted.take(5)
-    for(i <- 0 until 4) {
+    for(i <- 0 until 5) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
     }
     val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
@@ -68,6 +68,5 @@ object RidgeRegressionApp{
     println("Ridge Regression - Mean Squared Error: "  + mse)
     println("Ridge Regression  - Mean Absolute Error: " + mae)
     println("Ridge Regression  - Root Mean Squared Log Error:" + rmsle)
-    //sc.stop()
   }
 }

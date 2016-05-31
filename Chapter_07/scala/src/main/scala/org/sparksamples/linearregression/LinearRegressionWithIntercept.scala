@@ -1,6 +1,7 @@
-package org.sparksamples
+package org.sparksamples.linearregression
 
 import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
+import org.sparksamples.Util
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
@@ -9,7 +10,7 @@ import scala.collection.mutable.ListBuffer
   * LogisticalRegression App
   * @author Rajdeep Dua
   */
-object LinearModelApp{
+object LinearRegressionWithIntercept{
 
 
 
@@ -42,6 +43,9 @@ object LinearModelApp{
     val data = {
       records.map(r => LabeledPoint(Util.extractLabel(r), Util.extractFeatures(r, catLen, mappings)))
     }
+    val data1 = {
+      records.map(r => Util.extractFeatures(r, catLen, mappings))
+    }
     val first_point = data.first()
     println("Linear Model feature vector:" + first_point.features.toString)
     println("Linear Model feature vector length: " + first_point.features.size)
@@ -51,8 +55,10 @@ object LinearModelApp{
     val step = 0.025
     val intercept =true
 
-    //LinearRegressionWithSGD.tr
-    val linear_model = LinearRegressionWithSGD.train(data, iterations, step)
+    val linReg = new LinearRegressionWithSGD().setIntercept(intercept)
+    linReg.optimizer.setNumIterations(iterations).setStepSize(step)
+    val linear_model = linReg.run(data)
+    print(data.first());
     val x = linear_model.predict(data.first().features)
     val true_vs_predicted = data.map(p => (p.label, linear_model.predict(p.features)))
     val true_vs_predicted_csv = data.map(p => p.label + " ,"  + linear_model.predict(p.features))
@@ -63,7 +69,7 @@ object LinearModelApp{
       true_vs_predicted_csv.saveAsTextFile("./output/linear_model_" + date + ".csv")
     }
     val true_vs_predicted_take5 = true_vs_predicted.take(5)
-    for(i <- 0 until 4) {
+    for(i <- 0 until 5) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
     }
     val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()

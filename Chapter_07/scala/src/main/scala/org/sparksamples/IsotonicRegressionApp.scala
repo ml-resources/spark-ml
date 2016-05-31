@@ -66,6 +66,10 @@ object IsotonicRegressionApp{
       val date = format.format(new java.util.Date())
       true_vs_predicted_csv.saveAsTextFile("./output/isotonic_regression_" + date + ".csv")
     }
+    val true_vs_predicted_take5 = true_vs_predicted.take(5)
+    for(i <- 0 until 5) {
+      println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
+    }
 
     val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
     val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()

@@ -42,6 +42,8 @@ def main():
 
     predictions = gbt_model.predict(data.map(lambda x: x.features))
     labelsAndPredictions = data.map(lambda lp: lp.label).zip(predictions)
+    print "GradientBoosted Trees predictions: " + str(labelsAndPredictions.take(5))
+
     mse = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() /\
         float(data.count())
     mae = labelsAndPredictions.map(lambda (v, p): np.abs(v - p)).sum() /\

@@ -20,6 +20,8 @@ except ImportError as e:
 
 def main():
     records = get_records()
+    print records.first()
+    print records.count()
     records.cache()
     print "Mapping of first categorical feature column: %s" % get_mapping(records, 2)
 

@@ -1,6 +1,7 @@
-package org.sparksamples
+package org.sparksamples.linearregression
 
 import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
+import org.sparksamples.Util
 
 import scala.collection.Map
 import scala.collection.mutable.ListBuffer
@@ -9,7 +10,7 @@ import scala.collection.mutable.ListBuffer
   * LogisticalRegression App
   * @author Rajdeep Dua
   */
-object LinearModelApp{
+object LinearRegression{
 
 
 
@@ -63,16 +64,17 @@ object LinearModelApp{
       true_vs_predicted_csv.saveAsTextFile("./output/linear_model_" + date + ".csv")
     }
     val true_vs_predicted_take5 = true_vs_predicted.take(5)
-    for(i <- 0 until 4) {
+    for(i <- 0 until 5) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
     }
-    val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
+    /*val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
     val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
 
     println("Linear Model - Mean Squared Error: "  + mse)
     println("Linear Model - Mean Absolute Error: " + mae)
-    println("Linear Model - Root Mean Squared Log Error:" + rmsle)
+    println("Linear Model - Root Mean Squared Log Error:" + rmsle)*/
+    Util.calculatePrintMetrics(true_vs_predicted, "LinearRegressioWithSGD")
 
   }
 

@@ -10,7 +10,7 @@ import scala.collection.Map
   * Created by rajdeep dua on 4/15/16.
   */
 object Util {
-  val PATH= "../data/hour_noheader.csv"
+  val PATH= "../data/hour_noheader_1000.csv"
   val spConfig = (new SparkConf).setMaster("local[1]").setAppName("SparkApp").
     set("spark.driver.allowMultipleContexts", "true")
   val sc = new SparkContext(spConfig)
@@ -166,6 +166,16 @@ object Util {
 
   def get_mapping(rdd :RDD[Array[String]], idx: Int) : Map[String, Long] = {
     return rdd.map( fields=> fields(idx)).distinct().zipWithIndex().collectAsMap()
+  }
+
+  def calculatePrintMetrics(true_vs_predicted: RDD[(Double, Double)], algo: String) = {
+    val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
+    val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
+    val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
+
+    println(algo + " - Mean Squared Error: "  + mse)
+    println(algo + " - Mean Absolute Error: " + mae)
+    println(algo + " - Root Mean Squared Log Error:" + rmsle)
   }
 
 }

@@ -62,7 +62,7 @@ object GradientBoostedTreesApp{
     val model = GradientBoostedTrees.train(data, boostingStrategy)
     val true_vs_predicted = data.map(p => (p.label, model.predict(p.features)))
     val true_vs_predicted_take5 = true_vs_predicted.take(5)
-    for(i <- 0 until 4) {
+    for(i <- 0 until 5) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
     }
     val save = true

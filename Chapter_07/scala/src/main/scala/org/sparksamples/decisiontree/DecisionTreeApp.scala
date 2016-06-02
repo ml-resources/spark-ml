@@ -78,13 +78,14 @@ object DecisionTreeApp{
 
     print("Decision Tree depth: " + decisionTreeModel.depth)
     print("Decision Tree number of nodes: " + decisionTreeModel.numNodes)
-    val mse = true_vs_predicted_dt.map{ case(t, p) => Util.squaredError(t, p)}.mean()
+    /*val mse = true_vs_predicted_dt.map{ case(t, p) => Util.squaredError(t, p)}.mean()
     val mae = true_vs_predicted_dt.map{ case(t, p) => Util.absError(t, p)}.mean()
     val rmsle = Math.sqrt(true_vs_predicted_dt.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
 
     println("Decision Tree Model - Mean Squared Error: "  + mse)
     println("Decision Tree - Mean Absolute Error: " + mae)
-    println("Decision Tree Model - Root Mean Squared Log Error:" + rmsle)
+    println("Decision Tree Model - Root Mean Squared Log Error:" + rmsle)*/
+    Util.calculatePrintMetrics(true_vs_predicted_dt, "Decision Tree")
     Util.sc.stop()
   }
 

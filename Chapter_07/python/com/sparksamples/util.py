@@ -59,6 +59,28 @@ def extract_features_dt(record):
     print str(x)
     return np.array(map(float, record[2:14]))
 
+def extract_sum_feature(record,cat_len, mappings):
+    x = extract_features(record, cat_len, mappings)
+    sum = 0.0
+    length = len(record)
+    for index in range(length):
+        sum += x[index]
+        print sum
+
+    return sum
+# def extractSumFeature(record : Array[String], cat_len: Int,
+#                       mappings:scala.collection.immutable.List[scala.collection.Map[String,Long]]): Double ={
+#     //var cat_vec = Vectors.zeros(cat_len)
+#     //val cat_array = cat_vec.toArray
+#     val x = extractFeatures(record, cat_len, mappings)
+#     var sum = 0.0
+#     for(y <- 0 until 14){
+#
+#         sum = sum + x(y).toDouble
+#     }
+#     return sum.toDouble
+#   }
+
 def squared_error(actual, pred):
     return (pred - actual)**2
 

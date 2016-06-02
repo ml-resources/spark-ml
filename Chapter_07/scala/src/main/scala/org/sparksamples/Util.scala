@@ -83,7 +83,7 @@ object Util {
 
   }
 
-  def extractAvgFeature(record : Array[String], cat_len: Int,
+  def extractSumFeature(record : Array[String], cat_len: Int,
                       mappings:scala.collection.immutable.List[scala.collection.Map[String,Long]]): Double ={
     //var cat_vec = Vectors.zeros(cat_len)
     //val cat_array = cat_vec.toArray
@@ -95,6 +95,7 @@ object Util {
     }
     return sum.toDouble
   }
+
   def extractAvgFeature2(record : Array[String]): Double ={
     //var cat_vec = Vectors.zeros(cat_len)
     //val cat_array = cat_vec.toArray

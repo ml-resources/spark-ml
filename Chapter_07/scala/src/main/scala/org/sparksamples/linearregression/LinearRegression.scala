@@ -67,13 +67,7 @@ object LinearRegression{
     for(i <- 0 until 5) {
       println("True vs Predicted: " + "i :" + true_vs_predicted_take5(i))
     }
-    /*val mse = true_vs_predicted.map{ case(t, p) => Util.squaredError(t, p)}.mean()
-    val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
-    val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
 
-    println("Linear Model - Mean Squared Error: "  + mse)
-    println("Linear Model - Mean Absolute Error: " + mae)
-    println("Linear Model - Root Mean Squared Log Error:" + rmsle)*/
     Util.calculatePrintMetrics(true_vs_predicted, "LinearRegressioWithSGD")
 
   }

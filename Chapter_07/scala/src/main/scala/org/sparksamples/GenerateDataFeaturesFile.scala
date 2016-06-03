@@ -45,8 +45,7 @@ object GenerateDataFeaturesFile{
     print("Total feature vector length: " + totalLen)
 
     val data = {
-      records.map(r => Util.extractLabel(r) + "," +  Util.extractAvgFeature(r, catLen, mappings))
-      //records.map(r => Util.extractLabel(r) + "," +  r(13))
+      records.map(r => Util.extractLabel(r) + "," +  Util.extractSumFeature(r, catLen, mappings))
     }
 
     val data_collection = data.collect()

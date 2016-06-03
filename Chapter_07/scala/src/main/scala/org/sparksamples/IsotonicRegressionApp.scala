@@ -16,10 +16,6 @@ object IsotonicRegressionApp{
 
   def main(args: Array[String]) {
     val sc = Util.sc
-    //val conf = (new SparkConf).setMaster("local[1]").setAppName("SparkApp").
-    //  set("spark.driver.allowMultipleContexts", "true")
-    //val sc = new SparkContext(conf)
-
 
     // we take the raw data in CSV format and convert it into a set of records
     // of the form (user, product, price)
@@ -27,7 +23,7 @@ object IsotonicRegressionApp{
     val numData = rawData.count()
     val records = rawData.map(line => line.split(","))
     records.cache()
-    //print("Mapping of first categorical feature column: " +  get_mapping(records, 2))
+
     var list = new ListBuffer[Map[String, Long]]()
     for( i <- 2 to 9){
       val m = get_mapping(records, i)
@@ -45,7 +41,7 @@ object IsotonicRegressionApp{
       records.map(r => LabeledPoint(Util.extractLabel(r), Util.extractFeatures(r, catLen, mappings)))
     }
     val parsedData = records.map { r =>
-      (Util.extractLabel(r), Util.extractAvgFeature(r, catLen, mappings), 1.0)
+      (Util.extractLabel(r), Util.extractSumFeature(r, catLen, mappings), 1.0)
     }
 
     val iterations = 10
@@ -75,7 +71,7 @@ object IsotonicRegressionApp{
     val mae = true_vs_predicted.map{ case(t, p) => Util.absError(t, p)}.mean()
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())
 
-    println("completed")
+    Util.calculatePrintMetrics(true_vs_predicted, "Isotonic Regression")
 
   }
 }

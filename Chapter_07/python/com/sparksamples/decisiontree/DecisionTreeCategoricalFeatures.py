@@ -27,7 +27,7 @@ def main():
     records = get_records()
     records.cache()
 
-    print "Mapping of first categorical feasture column: %s" % get_mapping(records, 2)
+    print "Mapping of first categorical feature column: %s" % get_mapping(records, 2)
 
     # extract all the catgorical mappings
     mappings = [get_mapping(records, i) for i in range(2,10)]
@@ -41,12 +41,12 @@ def main():
     cat_features = dict([(i - 2, len(get_mapping(records, i)) + 1) for i in range(2,10)])
     print "Categorical feature size mapping %s" % cat_features
     # train the model again
-    dt_model_2 = DecisionTree.trainRegressor(data_dt, categoricalFeaturesInfo=cat_features)
-    preds_2 = dt_model_2.predict(data_dt.map(lambda p: p.features))
-    actual_2 = data.map(lambda p: p.label)
-    true_vs_predicted_dt_2 = actual_2.zip(preds_2)
+    dt_model = DecisionTree.trainRegressor(data_dt, categoricalFeaturesInfo=cat_features)
+    preds = dt_model.predict(data_dt.map(lambda p: p.features))
+    actual = data.map(lambda p: p.label)
+    true_vs_predicted_dt = actual.zip(preds)
 
-    calculate_print_metrics("Decision Tree Categorical", true_vs_predicted_dt_2)
+    calculate_print_metrics("Decision Tree Categorical Features", true_vs_predicted_dt)
 
 
 if __name__ == "__main__":

@@ -43,6 +43,8 @@ object PlotRawData {
     for(i <- 0 until records_collect.length){
       for (j <- 0 until (max + step) by step) {
         if(records_int(i) >= (j) && records_int(i) < (j + step)){
+          print(mx(j))
+          print(mx)
           mx = mx + (j -> (mx(j) + 1))
         }
       }

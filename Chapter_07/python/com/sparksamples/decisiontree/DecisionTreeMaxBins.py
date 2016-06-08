@@ -35,6 +35,9 @@ def execute():
     print metrics
     P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
+    plt.title('Decision Trees - Max Bins')
+    plt.xlabel('Max Bins')
+    plt.ylabel('RMSLE')
 
     P.show()
 

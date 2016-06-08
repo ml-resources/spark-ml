@@ -30,7 +30,6 @@ def execute():
     params = [10, 16, 32, 64]
     lrRate = 0.1
     mxDepth = 3
-    mxBins = 32
     nmIterations = 10
     #def evaluate_gbt(train, test, numItr, lrRate, mxDepth, mxBins):
     # def trainRegressor(cls, data, categoricalFeaturesInfo,
@@ -41,7 +40,7 @@ def execute():
     print metrics
     P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
-    #plt.xscale('log')
+
     plt.title('GradientBoosted Trees - MaxBins')
     plt.xlabel('iterations')
     plt.ylabel('RMSLE')

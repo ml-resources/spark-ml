@@ -53,14 +53,18 @@ object GradientBoostedTreesUtil {
 
 
   def evaluate(train: RDD[LabeledPoint],test: RDD[LabeledPoint], iterations:Int, maxDepth:Int): Double ={
-    //val linReg = new LinearRegressionWithSGD().setIntercept(intercept)
-    //linReg.optimizer.setNumIterations(iterations).setStepSize(step)
-    //val linear_model = linReg.run(train)
+
     var boostingStrategy = BoostingStrategy.defaultParams("Regression")
     boostingStrategy.setNumIterations(iterations)
     boostingStrategy.treeStrategy.setMaxDepth(maxDepth)
 
     val model = GradientBoostedTrees.train(train, boostingStrategy)
+//
+//    @classmethod
+//    @since("1.3.0")
+//    def trainRegressor(cls, data, categoricalFeaturesInfo,
+//                       loss="leastSquaresError", numIterations=100, learningRate=0.1, maxDepth=3,
+//                       maxBins=32):
 
     val true_vs_predicted = test.map(p => (p.label, model.predict(p.features)))
     val rmsle = Math.sqrt(true_vs_predicted.map{ case(t, p) => Util.squaredLogError(t, p)}.mean())

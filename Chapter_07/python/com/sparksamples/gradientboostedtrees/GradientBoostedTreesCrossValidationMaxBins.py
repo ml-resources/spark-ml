@@ -27,22 +27,23 @@ def main():
 
 def execute():
     train_data, test_data = get_train_test_data()
-    params = [1, 5, 10, 20]
+    params = [10, 16, 32, 64]
     lrRate = 0.1
     mxDepth = 3
     mxBins = 32
+    nmIterations = 10
     #def evaluate_gbt(train, test, numItr, lrRate, mxDepth, mxBins):
     # def trainRegressor(cls, data, categoricalFeaturesInfo,
     #                   loss="leastSquaresError", numIterations=100, learningRate=0.1, maxDepth=3,
     #                   maxBins=32):
-    metrics = [evaluate_gbt(train_data, test_data, param, lrRate, mxDepth, mxBins ) for param in params]
+    metrics = [evaluate_gbt(train_data, test_data, nmIterations, lrRate, mxDepth, param) for param in params]
     print params
     print metrics
     P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
-    plt.xscale('log')
-    plt.title('GradientBoosted Trees - Iterators')
-    plt.xlabel('iterations - log scale')
+    #plt.xscale('log')
+    plt.title('GradientBoosted Trees - MaxBins')
+    plt.xlabel('iterations')
     plt.ylabel('RMSLE')
 
     P.show()

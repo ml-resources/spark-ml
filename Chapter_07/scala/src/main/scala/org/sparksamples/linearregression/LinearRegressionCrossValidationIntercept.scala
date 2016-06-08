@@ -20,8 +20,8 @@ object LinearRegressionCrossValidationIntercept{
     val iterations = 10
     val step = 0.1
     val paramsArray = new Array[Boolean](2)
-    paramsArray(0) = true
-    paramsArray(1) = false
+    paramsArray(0) = false
+    paramsArray(1) = true
     val i = 0
     val results = new Array[String](2)
     val resultsMap = new scala.collection.mutable.HashMap[String, String]
@@ -35,10 +35,10 @@ object LinearRegressionCrossValidationIntercept{
     }
 
     val chart = new LineChart(
-      "Steps" ,
+      "Intercept" ,
       "LinearRegressionWithSGD : RMSLE vs Intercept")
     chart.exec("Steps","RMSLE",dataset)
-    chart.lineChart.getCategoryPlot().getRangeAxis().setRange(1.56, 1.57)
+    chart.lineChart.getCategoryPlot().getRangeAxis().setRange(1.56, 1.58)
 
     chart.pack( )
 

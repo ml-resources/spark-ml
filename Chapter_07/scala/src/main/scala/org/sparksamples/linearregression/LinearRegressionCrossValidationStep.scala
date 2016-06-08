@@ -29,12 +29,12 @@ object LinearRegressionCrossValidationStep{
       val rmsle = LinearRegressionUtil.evaluate(train_data, test_data,iterations,step,intercept)
       //results(i) = step + ":" + rmsle
       resultsMap.put(step.toString,rmsle.toString)
-      dataset.addValue(rmsle, "RMSLE", step)
+      dataset.addValue(rmsle, "RMSLE", Math.log(step))
     }
     val chart = new LineChart(
       "Steps" ,
       "LinearRegressionWithSGD : RMSLE vs Steps")
-    chart.exec("Steps","RMSLE",dataset)
+    chart.exec("Steps - Log Scale","RMSLE",dataset)
     chart.pack( )
     RefineryUtilities.centerFrameOnScreen( chart )
     chart.setVisible( true )

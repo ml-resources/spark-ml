@@ -33,12 +33,12 @@ object LinearRegressionCrossValidationIterations{
       val rmsle = LinearRegressionUtil.evaluate(train_data, test_data,iteration,step,intercept)
       //results(i) = step + ":" + rmsle
       resultsMap.put(iteration.toString,rmsle.toString)
-      dataset.addValue(rmsle, "RMSLE", iteration)
+      dataset.addValue(rmsle, "RMSLE", Math.log(iteration))
     }
     val chart = new LineChart(
       "Iterations" ,
       "LinearRegressionWithSGD : RMSLE vs Iterations")
-    chart.exec("Iterations","RMSLE",dataset)
+    chart.exec("Iterations - Log Value","RMSLE",dataset)
     chart.pack( )
     RefineryUtilities.centerFrameOnScreen( chart )
     chart.setVisible( true )

@@ -10,7 +10,7 @@ import scala.collection.Map
   * Created by rajdeep dua on 4/15/16.
   */
 object Util {
-  val PATH= "../data/hour_noheader_5.csv"
+  val PATH= "../data/hour_noheader.csv"
   val spConfig = (new SparkConf).setMaster("local[1]").setAppName("SparkApp").
     set("spark.driver.allowMultipleContexts", "true")
   val sc = new SparkContext(spConfig)

@@ -5,21 +5,17 @@ import org.jfree.ui.RefineryUtilities
 import org.sparksamples.chart.LineChart
 
 /**
-  * LogisticalRegression App
+  * Decision Tree Max Bins
   * @author Rajdeep Dua
   */
 object DecisionTreeMaxBins{
 
-  
   def main(args: Array[String]) {
 
     val data = DecisionTreeUtil.getTrainTestData()
     val train_data = data._1
     val test_data = data._2
     val iterations = 10
-    // params = [2, 4, 8, 16, 32, 64, 100]
-    //val steps_param = Array(0.01, 0.025, 0.05, 0.1, 1.0)
-    //val intercept =false
     val bins_param = Array(2, 4, 8, 16, 32, 64, 100)
     val maxDepth = 5
     val categoricalFeaturesInfo = scala.Predef.Map[Int, Int]()
@@ -45,7 +41,6 @@ object DecisionTreeMaxBins{
     RefineryUtilities.centerFrameOnScreen( chart )
     chart.setVisible( true )
     print(resultsMap)
-
   }
 
 }

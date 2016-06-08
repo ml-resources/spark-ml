@@ -52,11 +52,13 @@ object GradientBoostedTreesUtil {
 
 
 
-  def evaluate(train: RDD[LabeledPoint],test: RDD[LabeledPoint], iterations:Int, maxDepth:Int): Double ={
+  def evaluate(train: RDD[LabeledPoint],test: RDD[LabeledPoint], iterations:Int, maxDepth:Int,
+               maxBins: Int): Double ={
 
     var boostingStrategy = BoostingStrategy.defaultParams("Regression")
     boostingStrategy.setNumIterations(iterations)
     boostingStrategy.treeStrategy.setMaxDepth(maxDepth)
+    boostingStrategy.treeStrategy.setMaxBins(maxBins)
 
     val model = GradientBoostedTrees.train(train, boostingStrategy)
 //

@@ -9,10 +9,7 @@ import org.sparksamples.chart.LineChart
   * @author Rajdeep Dua
   */
 object LinearRegressionCrossValidationIntercept{
-
-
   def main(args: Array[String]) {
-
     val data = LinearRegressionUtil.getTrainTestData()
     val train_data = data._1
     val test_data = data._2

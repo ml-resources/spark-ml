@@ -20,13 +20,14 @@ object GradientBoostedTreesMaxDepth{
     val iterations_param = Array(1, 5, 10, 15, 18)
     val iteration = 5
     val maxDepth_param = Array(1,5, 7, 10)
+    val maxBin = 10
 
     val i = 0
     val resultsMap = new scala.collection.mutable.HashMap[String, String]
     val dataset = new DefaultCategoryDataset()
     for(i <- 0 until maxDepth_param.length) {
       val maxDepth = maxDepth_param(i)
-      val rmsle = GradientBoostedTreesUtil.evaluate(train_data, test_data,iteration,maxDepth)
+      val rmsle = GradientBoostedTreesUtil.evaluate(train_data, test_data,iteration,maxDepth, maxBin)
       resultsMap.put(maxDepth.toString,rmsle.toString)
       dataset.addValue(rmsle, "RMSLE", maxDepth)
     }

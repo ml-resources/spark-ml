@@ -10,7 +10,7 @@ import scala.collection.Map
 import scala.collection.mutable.ListBuffer
 
 /**
- * A simple Spark app in Scala
+ * @author Rajdeep Dua
  */
 object GradientBoostedTreesApp{
 
@@ -53,8 +53,6 @@ object GradientBoostedTreesApp{
 
 
     var boostingStrategy = BoostingStrategy.defaultParams("Regression")
-    //boostingStrategy.numIterations = 3 // Note: Use more iterations in practice.
-    //boostingStrategy.treeStrategy.maxDepth = 5
     boostingStrategy.setNumIterations(3)// Note: Use more iterations in practice.
     boostingStrategy.treeStrategy.setMaxDepth(5)
 
@@ -79,6 +77,5 @@ object GradientBoostedTreesApp{
     println("Gradient Boosted Trees - Mean Squared Error: "  + mse)
     println("Gradient Boosted Trees - Mean Absolute Error: " + mae)
     println("Gradient Boosted Trees - Root Mean Squared Log Error:" + rmsle)
-    //sc.stop()
   }
 }

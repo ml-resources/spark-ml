@@ -11,11 +11,7 @@ import scala.collection.mutable.ListBuffer
   * @author Rajdeep Dua
   */
 object LinearRegression{
-
-
-
   def main(args: Array[String]) {
-
     val recordsArray = Util.getRecords()
     val records = recordsArray._1
     val first = records.first()
@@ -48,7 +44,6 @@ object LinearRegression{
     println("Linear Model feature vector length: " + first_point.features.size)
 
     val iterations = 10
-    //val step = 0.2
     val step = 0.025
     val intercept =true
 

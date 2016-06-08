@@ -30,7 +30,6 @@ def execute():
     params = [10, 16, 32, 64]
     lrRate = 0.1
     mxDepth = 3
-    mxBins = 32
     nmIterations = 10
     #def evaluate_gbt(train, test, numItr, lrRate, mxDepth, mxBins):
     # def trainRegressor(cls, data, categoricalFeaturesInfo,

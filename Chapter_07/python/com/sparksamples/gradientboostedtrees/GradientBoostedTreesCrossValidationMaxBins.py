@@ -41,7 +41,7 @@ def execute():
     print metrics
     P.plot(params, metrics)
     fig = matplotlib.pyplot.gcf()
-    #plt.xscale('log')
+
     plt.title('GradientBoosted Trees - MaxBins')
     plt.xlabel('iterations')
     plt.ylabel('RMSLE')

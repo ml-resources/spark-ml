@@ -13,9 +13,12 @@ from com.sparksamples.util import squared_log_error
 __author__ = 'Rajdeep Dua'
 
 
-def evaluate_gbt(train, test,numItr):
-    gbt_model = GradientBoostedTrees.trainRegressor(train,categoricalFeaturesInfo={}, numIterations=numItr)
-
+def evaluate_gbt(train, test, numItr, lrRate, mxDepth, mxBins):
+     # def trainRegressor(cls, data, categoricalFeaturesInfo,
+     #                   loss="leastSquaresError", numIterations=100, learningRate=0.1, maxDepth=3,
+     #                   maxBins=32):
+    gbt_model = GradientBoostedTrees.trainRegressor(train,categoricalFeaturesInfo={}, numIterations=numItr,
+                                                    maxDepth=mxDepth, maxBins=mxBins, learningRate=lrRate)
     predictions = gbt_model.predict(test.map(lambda x: x.features))
     tp = test.map(lambda lp: lp.label).zip(predictions)
     rms_le = np.sqrt(tp.map(lambda (t, p): squared_log_error(t, p)).mean())

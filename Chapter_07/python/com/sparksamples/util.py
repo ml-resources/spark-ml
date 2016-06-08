@@ -10,7 +10,7 @@ except ImportError as e:
     sys.exit(1)
 PROJECT_HOME = "/home/ubuntu/work/ml-resources/spark-ml"
 path = PROJECT_HOME + "/Chapter_07/data/hour_noheader.csv"
-
+SPARK_HOME = "/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6/"
 def get_records():
     conf = (SparkConf()
          .setMaster("local")

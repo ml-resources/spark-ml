@@ -7,10 +7,11 @@ from com.sparksamples.util import get_mapping
 from com.sparksamples.util import extract_features
 from com.sparksamples.util import extract_label
 from com.sparksamples.util import get_records
+from com.sparksamples.util import SPARK_HOME
 from com.sparksamples.util import calculate_print_metrics
 
-os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6/"
-sys.path.append("/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6//python")
+os.environ['SPARK_HOME'] = SPARK_HOME
+sys.path.append(SPARK_HOME + "/python")
 try:
     from pyspark import SparkContext
     from pyspark import SparkConf

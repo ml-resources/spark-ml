@@ -16,8 +16,10 @@ except ImportError as e:
     print ("Error importing Spark Modules", e)
     sys.exit(1)
 
-os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"
-sys.path.append("/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6//python")
+from com.sparksamples.util import SPARK_HOME
+
+os.environ['SPARK_HOME'] = SPARK_HOME
+sys.path.append(SPARK_HOME + "/python")
 
 def get_train_test_data():
     records = get_records()

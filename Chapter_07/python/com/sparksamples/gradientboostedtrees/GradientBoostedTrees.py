@@ -10,13 +10,11 @@ from com.sparksamples.util import extract_features
 from com.sparksamples.util import extract_label
 from com.sparksamples.util import get_records
 
-# Set the path for spark installation
-# this is the path where you have built spark using sbt/sbt assembly
-os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"
+from com.sparksamples.util import SPARK_HOME
 
-# Append to PYTHONPATH so that pyspark could be found
-sys.path.append("/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6//python")
-# Now we are ready to import Spark Modules
+os.environ['SPARK_HOME'] = SPARK_HOME
+sys.path.append(SPARK_HOME + "/python")
+
 try:
     from pyspark import SparkContext
     from pyspark import SparkConf

@@ -10,7 +10,7 @@ from com.sparksamples.util import extract_label
 from com.sparksamples.util import extract_features_dt
 from com.sparksamples.util import get_records
 from com.sparksamples.util import calculate_print_metrics
-
+from com.sparksamples.util import SPARK_HOME
 
 try:
     from pyspark import SparkContext
@@ -19,8 +19,8 @@ except ImportError as e:
     print ("Error importing Spark Modules", e)
     sys.exit(1)
 
-os.environ['SPARK_HOME'] = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/"
-sys.path.append("/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6//python")
+os.environ['SPARK_HOME'] = SPARK_HOME
+sys.path.append(SPARK_HOME + "/python")
 
 def main():
     records = get_records()

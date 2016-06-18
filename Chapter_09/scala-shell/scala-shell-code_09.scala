@@ -137,7 +137,7 @@ import breeze.linalg.DenseMatrix
 val pcBreeze = new DenseMatrix(rows, cols, pc.toArray)
 import breeze.linalg.csvwrite
 import java.io.File
-csvwrite(new File("/tmp/pc.csv"), pcBreeze)
+csvwrite(new File("./tmp/pc.csv"), pcBreeze)
 
 // project the raw images to the K-dimensional space of the principla components
 val projected = matrix.multiply(pc)
@@ -196,7 +196,7 @@ sValues.foreach(println)
 */
 val svd300 = matrix.computeSVD(300, computeU = false)
 val sMatrix = new DenseMatrix(1, 300, svd300.s.toArray)
-csvwrite(new File("/tmp/s.csv"), sMatrix)
+csvwrite(new File("./tmp/s.csv"), sMatrix)
 
 
 

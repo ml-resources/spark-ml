@@ -1,7 +1,5 @@
 package org.sparksamples
 
-import java.io.File
-
 import breeze.linalg._
 import org.apache.spark.mllib.feature.StandardScaler
 import org.apache.spark.mllib.linalg.Vectors
@@ -30,6 +28,10 @@ object ImageProcessing {
     val aeImage = Util.loadImageFromFile(aePath)
 
     val grayImage = Util.processImage(aeImage, 100, 100)
+    import java.io.File
+    import javax.imageio.ImageIO
+    ImageIO.write(grayImage, "jpg", new File("/tmp/aeGray.jpg"))
+
 
     val pixels = files.map(f => Util.extractPixels(f, 50, 50))
     println(pixels.take(10).map(_.take(10).mkString("", ",", ", ...")).mkString("\n"))

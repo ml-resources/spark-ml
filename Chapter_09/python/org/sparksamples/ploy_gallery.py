@@ -26,12 +26,6 @@ def main():
 
     plot_gallery(pc, 50, 50)
 
-    s = np.loadtxt("/tmp/s.csv", delimiter=",")
-    print(s.shape)
-    plt(s)
-    # (300,)
-    plt(cumsum(s))
-    plt.yscale('log')
 
 def plot_gallery(images, h, w, n_row=2, n_col=5):
         """Helper function to plot a gallery of portraits"""
@@ -43,6 +37,7 @@ def plot_gallery(images, h, w, n_row=2, n_col=5):
             plt.title("Eigenface %d" % (i + 1), size=12)
             plt.xticks(())
             plt.yticks(())
+            plt.show()
 
 if __name__ == "__main__":
     main()

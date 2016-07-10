@@ -50,7 +50,7 @@ object ImageProcessing {
     val cols = pc.numCols
     val pcBreeze = new DenseMatrix(rows, cols, pc.toArray)
     println(rows, cols)
-    csvwrite(new File("/tmp/pc.csv"), pcBreeze)
+    //csvwrite(new File("/tmp/pc.csv"), pcBreeze)
     val projected = matrix.multiply(pc)
     println(projected.numRows, projected.numCols)
     // (1055,10)
@@ -87,7 +87,8 @@ object ImageProcessing {
     */
     val svd300 = matrix.computeSVD(300, computeU = false)
     val sMatrix = new DenseMatrix(1, 300, svd300.s.toArray)
-    csvwrite(new File("./tmp/s.csv"), sMatrix)
+    println(sMatrix)
+    csvwrite(new File("/home/ubuntu/work/ml-resources/spark-ml/Chapter_09/scala/s.csv"), sMatrix)
 
   }
   def approxEqual(array1: Array[Double], array2: Array[Double], tolerance: Double = 1e-6): Boolean = {

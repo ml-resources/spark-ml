@@ -1,5 +1,12 @@
 """A simple Spark app in Python"""
+import os
+import sys
 from pyspark import SparkContext
+
+os.environ['SPARK_HOME']="/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6/"
+
+# Append pyspark  to Python Path
+sys.path.append("/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6")
 
 sc = SparkContext("local[2]", "First Spark App")
 # we take the raw data in CSV format and convert it into a set of records of the form (user, product, price)

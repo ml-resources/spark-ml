@@ -1,8 +1,4 @@
 package linalg.sgd
-import org.apache.spark.mllib.linalg.Vectors
-//import org.apache.spark.mllib.regression._
-import org.apache.spark.mllib.util.MLUtils
-import scala.collection.JavaConverters._
 import scala.util.Random
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.optimization.GradientDescent

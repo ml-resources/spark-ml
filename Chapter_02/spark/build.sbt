@@ -2,7 +2,9 @@ name := "maths-for-ml-spark"
 
 version := "1.0"
 
-libraryDependencies  ++= Seq(
+val sparkVersion = "2.0.0"
+
+/** libraryDependencies  ++= Seq(
   // other dependencies here
   //"org.scalanlp" %% "breeze" % "0.12",
   // native libraries are not included by default. add this if you want them (as of 0.7)
@@ -15,15 +17,22 @@ libraryDependencies  ++= Seq(
   //"org.scalanlp" %% "breeze-viz" % "0.12",
   "org.apache.spark"  % "spark-core_2.11" % "1.6.0",
   "org.apache.spark"  % "spark-mllib_2.11"  % "1.6.0"
-)
+) **/
 
+libraryDependencies ++= Seq(
+  "org.apache.spark" %% "spark-core" % sparkVersion,
+  //"org.apache.spark" %% "spark-sql" % sparkVersion,
+  "org.apache.spark" %% "spark-mllib" % sparkVersion
+  //"org.apache.spark" %% "spark-streaming" % sparkVersion
+  //"org.apache.spark" %% "spark-hive" % sparkVersion
+)
 
 resolvers ++= Seq(
   // other resolvers here
   // if you want to use snapshot builds (currently 0.12-SNAPSHOT), use this.
-  "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
-  "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+  //"Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
+  //"Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+  "Apache Repository" at "https://repository.apache.org/content/repositories/releases"
 )
 
 scalaVersion := "2.11.7"
-    

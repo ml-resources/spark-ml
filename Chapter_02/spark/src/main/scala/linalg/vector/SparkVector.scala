@@ -1,5 +1,5 @@
 package linalg.vector
-import org.apache.spark.mllib.linalg.{Vector, Vectors}
+import org.apache.spark.ml.linalg.{Vector, Vectors}
 
 object SparkVector {
 
@@ -48,13 +48,13 @@ object SparkVector {
     val sVectorOneNumNonZeros = sVectorOne.numNonzeros
     val sVectorOneSize = sVectorOne.size
     val sVectorOneArray = sVectorOne.toArray
-    val sVectorOneJson = sVectorOne.toJson
+    //val sVectorOneJson = sVectorOne.toJson
 
     println("sVectorOneMax:" + sVectorOneMax)
     println("sVectorOneNumNonZeros:" + sVectorOneNumNonZeros)
     println("sVectorOneSize:" + sVectorOneSize)
     println("sVectorOneArray:" + sVectorOneArray)
-    println("sVectorOneJson:" + sVectorOneJson)
+    //println("sVectorOneJson:" + sVectorOneJson)
     val dVectorOneToSparse = dVectorOne.toSparse
 
     println("dVectorOneToSparse:" + dVectorOneToSparse)

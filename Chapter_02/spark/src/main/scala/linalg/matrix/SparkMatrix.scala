@@ -1,7 +1,7 @@
 package linalg.matrix
 
-import org.apache.spark.mllib.linalg.Matrix
-import org.apache.spark.mllib.linalg.Matrices
+import org.apache.spark.ml.linalg.Matrix
+import org.apache.spark.ml.linalg.Matrices
 import org.apache.spark.mllib.linalg.distributed.RowMatrix
 import org.apache.spark.mllib.linalg.distributed.IndexedRowMatrix
 import org.apache.spark.mllib.linalg.distributed.CoordinateMatrix

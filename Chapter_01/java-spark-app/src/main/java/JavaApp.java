@@ -42,7 +42,7 @@ public class JavaApp {
                 sortedData.put(o._1(), o._2());
             }
             List<String> sorted = sortedData.entrySet()
-                    //.stream()
+                    .stream()
                     .sorted(Comparator.comparing((Map.Entry<String, Integer> entry) -> entry.getValue()).reversed())
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());

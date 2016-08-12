@@ -2,13 +2,17 @@
 import os
 import sys
 from pyspark import SparkContext
+from pyspark import SparkConf
 
-os.environ['SPARK_HOME']="/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6/"
+os.environ['SPARK_HOME']="/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
 
 # Append pyspark  to Python Path
-sys.path.append("/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6")
+sys.path.append("/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7")
 
-sc = SparkContext("local[2]", "First Spark App")
+conf = SparkConf().setAppName("First Spark App").setMaster("local")
+sc = SparkContext(conf=conf)
+
+
 # we take the raw data in CSV format and convert it into a set of records of the form (user, product, price)
 data = sc.textFile("data/UserPurchaseHistory.csv").map(lambda line: line.split(",")).\
     map(lambda record: (record[0], record[1], record[2]))

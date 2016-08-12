@@ -10,7 +10,8 @@ sys.path.append("/home/ubuntu/work/spark-1.6.1-bin-hadoop2.6")
 
 sc = SparkContext("local[2]", "First Spark App")
 # we take the raw data in CSV format and convert it into a set of records of the form (user, product, price)
-data = sc.textFile("data/UserPurchaseHistory.csv").map(lambda line: line.split(",")).map(lambda record: (record[0], record[1], record[2]))
+data = sc.textFile("data/UserPurchaseHistory.csv").map(lambda line: line.split(",")).\
+    map(lambda record: (record[0], record[1], record[2]))
 # let's count the number of purchases
 numPurchases = data.count()
 # let's count how many unique users made purchases

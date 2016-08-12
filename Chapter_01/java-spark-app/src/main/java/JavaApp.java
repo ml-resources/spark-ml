@@ -39,10 +39,10 @@ public class JavaApp {
             Iterator it = pairs.iterator();
             while (it.hasNext()) {
                 Tuple2<String, Integer> o = (Tuple2<String, Integer>) it.next();
-                sortedData.put(o._1, o._2);
+                sortedData.put(o._1(), o._2());
             }
             List<String> sorted = sortedData.entrySet()
-                    .stream()
+                    //.stream()
                     .sorted(Comparator.comparing((Map.Entry<String, Integer> entry) -> entry.getValue()).reversed())
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());

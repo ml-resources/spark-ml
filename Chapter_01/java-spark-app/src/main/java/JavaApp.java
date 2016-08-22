@@ -16,7 +16,7 @@ public class JavaApp {
 //           ####### create spark context by starting the cluster locally using 2 CPU cores #######
             sc = new JavaSparkContext("local[2]", "First Spark App");
 
-            JavaRDD<String[]> data = sc.textFile("data/UserPurchaseHistory.csv").map(s -> s.split(","));
+            JavaRDD<String[]> data = sc.textFile("Chapter_01/java-spark-app/data/UserPurchaseHistory.csv").map(s -> s.split(","));
 
 //           ####### let's count the number of purchases #######
             long numPurchases = data.count();

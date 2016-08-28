@@ -1,7 +1,7 @@
 package org.sparksamples
 
 import scala.collection.immutable.ListMap
-import scalax.chart._
+import scalax.chart.module.ChartFactories
 
 /**
   * Created by Rajdeep Dua on 2/22/16.

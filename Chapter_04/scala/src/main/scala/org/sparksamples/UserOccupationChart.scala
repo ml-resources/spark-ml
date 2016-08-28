@@ -1,7 +1,7 @@
 package org.sparksamples
 
 import scala.collection.immutable.ListMap
-import scalax.chart._
+import scalax.chart.module.ChartFactories
 import java.awt.Font
 import org.jfree.chart.axis.CategoryLabelPositions
 

@@ -1,4 +1,5 @@
 .DS_Store
+*.crc
 remachinelearningwithspark.zip
 remachinelearningwithspark/
 Chapter_02/maths-for-ml/.idea/
@@ -7,7 +8,11 @@ Chapter_02/maths-for-ml/target/
 *.*~
 target
 metastore_db
-.idea
+*.idea
 derby.log
 *.png
+*.Rhistory
+*.log
 *.pyc
+*.xml
+

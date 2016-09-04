@@ -1,4 +1,4 @@
-package org.sparksamples.df
+package org.sparksamples
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
@@ -29,14 +29,14 @@ object MovieData {
     years_filtered.foreachPartition(print(_))
 
     def convert2(x: String): Integer = {
-      val y = convert(x)
+      val y = Util.convert(x)
       return 1998 - y
     }
 
     val rowRdd_ages = sqlContext.sparkContext.textFile(PATH).map { line =>
       val tokens = line.split('|')
       Row(
-        convert(
+        Util.convert(
           org.sparksamples.Util.convertYear(tokens(2))
         )
       )
@@ -53,13 +53,6 @@ object MovieData {
 
   }
 
-  def convert(x: String) : Integer = {
-    return (1998 - x.toInt)
-  }
-
-  def convert(x: Integer) : Integer = {
-    return (1998 - x)
-  }
 
 
 }

@@ -8,7 +8,7 @@ import org.apache.spark.rdd.RDD
   * Created by Rajdeep Dua on 2/2/16.
   */
 object Util {
-  val PATH = "../.."
+  val PATH = "../../"
   val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
   val sc = new SparkContext(spConfig)
 

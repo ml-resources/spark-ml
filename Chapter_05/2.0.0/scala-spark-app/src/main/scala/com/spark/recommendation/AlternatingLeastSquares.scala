@@ -5,7 +5,16 @@ import org.apache.spark.sql.SparkSession
 
 /**
   * Created by manpreet.singh on 04/09/16.
+  *
+  * Matrix factorization assumes that:
+  * 1. Each user can be described by k attributes or features.
+  *    For example, feature 1 might be a number that says how much each user likes sci-fi movies.
+  * 2. Each item (movie) can be described by an analagous set of k attributes or features.
+  *    To correspond to the above example, feature 1 for the movie might be a number that says how close the movie is to pure sci-fi.
+  * 3. If we multiply each feature of the user by the corresponding feature of the movie and add everything together,
+  *    this will be a good approximation for the rating the user would give that movie.
   */
+
 object AlternatingLeastSquares {
 
   var movies = 0

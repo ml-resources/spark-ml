@@ -17,7 +17,7 @@ package object UserData {
     val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
     val spark = SparkSession
       .builder()
-      .appName("SparkSessionZipsExample").config(spConfig)
+      .appName("SparkUserData").config(spConfig)
       .getOrCreate()
 
     val user_df = spark.read.format("com.databricks.spark.csv")

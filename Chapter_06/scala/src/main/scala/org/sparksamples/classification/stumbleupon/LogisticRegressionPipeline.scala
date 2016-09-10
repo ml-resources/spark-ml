@@ -34,9 +34,11 @@ object LogisticRegressionPipeline {
       .setTrainRatio(0.8)
 
     val Array(training, test) = dataFrame.randomSplit(Array(0.8, 0.2), seed = 12345)
-    val model = trainValidationSplit.fit(training)
+    //val model = trainValidationSplit.fit(training)
+    val model = trainValidationSplit.fit(dataFrame)
 
-    val holdout = model.transform(test).select("prediction","label")
+    //val holdout = model.transform(test).select("prediction","label")
+    val holdout = model.transform(dataFrame).select("prediction","label")
 
     // have to do a type conversion for RegressionMetrics
     val rm = new RegressionMetrics(holdout.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double])))
@@ -51,13 +53,15 @@ object LogisticRegressionPipeline {
     logger.info("Test RMSE:")
     logger.info(rm.rootMeanSquaredError)
 
-    val totalPoints = test.count()
+    val totalPoints = dataFrame.count()
     val lrTotalCorrect = holdout.rdd.map(x => if (x(0).asInstanceOf[Double] == x(1).asInstanceOf[Double]) 1 else 0).sum()
     val accuracy = lrTotalCorrect/totalPoints
     println("Accuracy of LogisticRegression is: ", accuracy)
 
-    savePredictions(holdout, test, rm, "/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/sparkMLlib/dataset/stumbleupon/results/LogisticRegression.csv")
+    holdout.rdd.map(x => x(0).asInstanceOf[Double]).repartition(1).saveAsTextFile("/home/ubuntu/work/ml-resources/spark-ml/results/LR.xls")
+    holdout.rdd.map(x => x(1).asInstanceOf[Double]).repartition(1).saveAsTextFile("/home/ubuntu/work/ml-resources/spark-ml/results/Actual.xls")
 
+    savePredictions(holdout, dataFrame, rm, "/home/ubuntu/work/ml-resources/spark-ml/results/LogisticRegression.csv")
   }
 
   def savePredictions(predictions:DataFrame, testRaw:DataFrame, regressionMetrics: RegressionMetrics, filePath:String) = {
@@ -70,5 +74,4 @@ object LogisticRegressionPipeline {
       .option("header", "true")
       .save(filePath)
   }
-
 }

@@ -23,7 +23,7 @@ object StumbleUponExecutor {
 
     // get dataframe
     val df = sqlContext.read.format("com.databricks.spark.csv").option("delimiter", "\t").option("header", "true")
-      .option("inferSchema", "true").load("/home/ubuntu/work/ml-resources/spark-ml/Chapter_06/data/train.tsv")
+      .option("inferSchema", "true").load("/home/ubuntu/work/ml-resources/spark-ml/train.tsv")
 
     // pre-processing
     df.registerTempTable("StumbleUpon")
@@ -55,8 +55,6 @@ object StumbleUponExecutor {
       .withColumn("label", df("label").cast("double"))
     df1.printSchema()
 
-
-
     // user defined function for cleanup of ?
     val replacefunc = udf {(x:Double) => if(x == "?") 0.0 else x}
 
@@ -82,6 +80,7 @@ object StumbleUponExecutor {
       .withColumn("parametrizedLinkRatio", replacefunc(df1("parametrizedLinkRatio")))
       .withColumn("spelling_errors_ratio", replacefunc(df1("spelling_errors_ratio")))
       .withColumn("label", replacefunc(df1("label")))
+
     // drop first 4 columns
     val df3 = df2.drop("url").drop("urlid").drop("boilerplate").drop("alchemy_category").drop("alchemy_category_score")
 
@@ -100,11 +99,11 @@ object StumbleUponExecutor {
         ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
       .setOutputCol("features")
 
-    val df5 = prepareForNaiveBayes(df4)
-
-    val command = "NB"
+    val command = args(0)
 
     if(command.equals("NB")) {
+      val df5 = prepareForNaiveBayes(df4)
+
       val nbAssembler = new VectorAssembler()
         .setInputCols(Array("avglinksize", "commonlinkratio_1", "commonlinkratio_2", "commonlinkratio_3", "commonlinkratio_4", "compression_ratio"
           , "embed_ratio", "framebased", "frameTagRatio", "hasDomainLink", "html_ratio", "image_ratio"
@@ -112,12 +111,12 @@ object StumbleUponExecutor {
           ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
         .setOutputCol("features")
 
-      executeCommand(command, nbAssembler, df5)
+      executeCommand(command, nbAssembler, df5, sc)
     } else
-      executeCommand(command, assembler, df4)
+      executeCommand(command, assembler, df4, sc)
   }
 
-  def executeCommand(arg: String, vectorAssembler: VectorAssembler, dataFrame: DataFrame) = arg match {
+  def executeCommand(arg: String, vectorAssembler: VectorAssembler, dataFrame: DataFrame, sparkContext: SparkContext) = arg match {
     case "LR" => LogisticRegressionPipeline.logisticRegressionPipeline(vectorAssembler, dataFrame)
 
     case "DT" => DecisionTreePipeline.decisionTreePipeline(vectorAssembler, dataFrame)
@@ -127,6 +126,8 @@ object StumbleUponExecutor {
     case "GBT" => GradientBoostedTreePipeline.gradientBoostedTreePipeline(vectorAssembler, dataFrame)
 
     case "NB" => NaiveBayesPipeline.naiveBayesPipeline(vectorAssembler, dataFrame)
+
+    case "SVM" => SVMPipeline.svmPipeline(sparkContext)
   }
 
   def prepareForNaiveBayes(dataFrame: DataFrame): DataFrame = {

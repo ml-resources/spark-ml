@@ -1,23 +1,13 @@
 
-# coding: utf-8
-
-# In[1]:
-
-get_ipython().magic(u'pylab inline')
-import os
 import pyspark
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 sc = pyspark.SparkContext()
 
-
-# ## Exploring the User Dataset
-
-# In[2]:
-
-# replace this PATH with the correct path to the MovieLens dataset on your computer
 PATH = "/home/ubuntu/work/rajdeepd-spark-ml/spark-ml/data"
 user_data = sc.textFile("%s/ml-100k/u.user" % PATH)
 user_data.first()
-
 
 # In[3]:
 
@@ -28,11 +18,10 @@ num_occupations = user_fields.map(lambda fields: fields[3]).distinct().count()
 num_zipcodes = user_fields.map(lambda fields: fields[4]).distinct().count()
 print "Users: %d, genders: %d, occupations: %d, ZIP codes: %d" % (num_users, num_genders, num_occupations, num_zipcodes)
 
-
 # In[4]:
 
 ages = user_fields.map(lambda x: int(x[1])).collect()
-hist(ages, bins=20, color='lightblue', normed=True)
+plt.hist(ages, bins=20, color='lightblue', normed=True)
 fig = matplotlib.pyplot.gcf()
 fig.set_size_inches(16, 10)
 
@@ -95,7 +84,7 @@ years_filtered = years.filter(lambda x: x != 1900)
 movie_ages = years_filtered.map(lambda yr: 1998-yr).countByValue()
 values = movie_ages.values()
 bins = movie_ages.keys()
-hist(values, bins=bins, color='lightblue', normed=True)
+plt.hist(values, bins=bins, color='lightblue', normed=True)
 fig = matplotlib.pyplot.gcf()
 fig.set_size_inches(16,10)
 
@@ -169,7 +158,7 @@ user_ratings_byuser.take(5)
 
 # and finally plot the histogram
 user_ratings_byuser_local = user_ratings_byuser.map(lambda (k, v): v).collect()
-hist(user_ratings_byuser_local, bins=200, color='lightblue', normed=True)
+plt.hist(user_ratings_byuser_local, bins=200, color='lightblue', normed=True)
 fig = matplotlib.pyplot.gcf()
 fig.set_size_inches(16,10)
 

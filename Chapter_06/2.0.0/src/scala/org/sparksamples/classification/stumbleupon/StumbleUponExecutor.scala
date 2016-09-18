@@ -23,7 +23,7 @@ object StumbleUponExecutor {
 
     // get dataframe
     val df = sqlContext.read.format("com.databricks.spark.csv").option("delimiter", "\t").option("header", "true")
-      .option("inferSchema", "true").load("/home/ubuntu/work/ml-resources/spark-ml/train.tsv")
+      .option("inferSchema", "true").load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_06/2.0.0/src/scala/org/sparksamples/classification/dataset/stumbleupon/train.tsv")
 
     // pre-processing
     df.registerTempTable("StumbleUpon")
@@ -92,28 +92,28 @@ object StumbleUponExecutor {
     sqlContext.sql("SELECT * FROM StumbleUpon_PreProc").show()
 
     // setup pipeline
-    val assembler = new VectorAssembler()
-      .setInputCols(Array("avglinksize", "commonlinkratio_1", "commonlinkratio_2", "commonlinkratio_3", "commonlinkratio_4", "compression_ratio"
-        , "embed_ratio", "framebased", "frameTagRatio", "hasDomainLink", "html_ratio", "image_ratio"
-        ,"is_news", "lengthyLinkDomain", "linkwordscore", "news_front_page", "non_markup_alphanum_characters", "numberOfLinks"
-        ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
-      .setOutputCol("features")
-
-    val command = args(0)
-
-    if(command.equals("NB")) {
-      val df5 = prepareForNaiveBayes(df4)
-
-      val nbAssembler = new VectorAssembler()
-        .setInputCols(Array("avglinksize", "commonlinkratio_1", "commonlinkratio_2", "commonlinkratio_3", "commonlinkratio_4", "compression_ratio"
-          , "embed_ratio", "framebased", "frameTagRatio", "hasDomainLink", "html_ratio", "image_ratio"
-          ,"is_news", "lengthyLinkDomain", "linkwordscore", "news_front_page", "non_markup_alphanum_characters", "numberOfLinks"
-          ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
-        .setOutputCol("features")
-
-      executeCommand(command, nbAssembler, df5, sc)
-    } else
-      executeCommand(command, assembler, df4, sc)
+//    val assembler = new VectorAssembler()
+//      .setInputCols(Array("avglinksize", "commonlinkratio_1", "commonlinkratio_2", "commonlinkratio_3", "commonlinkratio_4", "compression_ratio"
+//        , "embed_ratio", "framebased", "frameTagRatio", "hasDomainLink", "html_ratio", "image_ratio"
+//        ,"is_news", "lengthyLinkDomain", "linkwordscore", "news_front_page", "non_markup_alphanum_characters", "numberOfLinks"
+//        ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
+//      .setOutputCol("features")
+//
+//    val command = args(0)
+//
+//    if(command.equals("NB")) {
+//      val df5 = prepareForNaiveBayes(df4)
+//
+//      val nbAssembler = new VectorAssembler()
+//        .setInputCols(Array("avglinksize", "commonlinkratio_1", "commonlinkratio_2", "commonlinkratio_3", "commonlinkratio_4", "compression_ratio"
+//          , "embed_ratio", "framebased", "frameTagRatio", "hasDomainLink", "html_ratio", "image_ratio"
+//          ,"is_news", "lengthyLinkDomain", "linkwordscore", "news_front_page", "non_markup_alphanum_characters", "numberOfLinks"
+//          ,"numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio"))
+//        .setOutputCol("features")
+//
+//      executeCommand(command, nbAssembler, df5, sc)
+//    } else
+//      executeCommand(command, assembler, df4, sc)
   }
 
   def executeCommand(arg: String, vectorAssembler: VectorAssembler, dataFrame: DataFrame, sparkContext: SparkContext) = arg match {

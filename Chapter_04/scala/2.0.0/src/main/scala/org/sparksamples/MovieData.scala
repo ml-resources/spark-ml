@@ -5,7 +5,7 @@ package org.sparksamples
 
 object MovieData {
 
-  def getMovieYearsCountSorted(): scala.Array[(Int,String)] = {
+    def getMovieYearsCountSorted(): scala.Array[(Int,String)] = {
     val movie_data_df = Util.getMovieDataDF()
     movie_data_df.createOrReplaceTempView("movie_data")
     movie_data_df.printSchema()
@@ -26,7 +26,7 @@ object MovieData {
 
     val movie_years = MovieData.getMovieYearsCountSorted()
     for( a <- 0 to (movie_years.length -1)){
-      print(movie_years(a))
+      println(movie_years(a))
     }
 
   }

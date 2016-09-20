@@ -29,24 +29,7 @@ object Util {
   }
 
   def getMovieDataDF() : DataFrame = {
-    //val PATH = "/home/ubuntu/work/ml-resources/spark-ml/data/ml-100k/u.item"
-    /*import org.apache.spark.sql.Row
 
-    val sqlContext = new SQLContext(org.sparksamples.Util.sc)
-
-    val rowRdd = sqlContext.sparkContext.textFile(PATH_MOVIES).map { line =>
-      val tokens = line.split('|')
-      Row(org.sparksamples.Util.convertYear(tokens(2)))
-    }
-    return rowRdd*/
-    case class Movie(name: String, age: Long)
-
-    /*val movieDF = spark.read
-      .textFile(PATH_MOVIES)
-      .map(_.split("|"))
-      .map(attributes => Movie(attributes(0), attributes(1).trim.toInt))
-      .toDF()
-    return movieDF*/
     //1|Toy Story (1995)|01-Jan-1995||http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)
     // |0|0|0|1|1|1|0|0|0|0|0|0|0|0|0|0|0|0|0
     val customSchema = StructType(Array(

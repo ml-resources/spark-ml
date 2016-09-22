@@ -33,7 +33,8 @@ object RatingData {
     val num_ratings = rating_df.count()
     val num_movies = Util.getMovieDataDF().count()
     val first = rating_df.first()
-    println(first)
+    println("first:" + first)
+    println("num_ratings:" + num_ratings)
 
     val max = Util.spark.sql("select max(rating)  from df")
     max.show()

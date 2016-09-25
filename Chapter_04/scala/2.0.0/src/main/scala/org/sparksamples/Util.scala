@@ -13,8 +13,8 @@ object Util {
   val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
   //val sc = new SparkContext(spConfig)
   val spark = SparkSession
-    .builder()
-    .appName("Spark SQL Example")
+    .builder().master("local")
+    .appName("Spark 2.0.0")
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
 

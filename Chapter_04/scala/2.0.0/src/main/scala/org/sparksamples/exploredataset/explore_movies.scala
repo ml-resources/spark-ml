@@ -1,14 +1,9 @@
 package org.sparksamples.exploredataset
 
-import java.io.File
-
 import breeze.linalg.CSCMatrix
 import org.apache.spark.SparkContext
+import org.sparksamples.Util
 import org.apache.spark.mllib.feature.Word2Vec
-import org.jfree.chart.plot.PlotOrientation
-import org.jfree.chart.{ChartFactory, ChartUtilities}
-import org.jfree.data.statistics.{HistogramDataset, HistogramType}
-
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -16,42 +11,62 @@ import scala.collection.mutable.ListBuffer
   */
 object explore_movies {
 
+  def processRegex(input:String):String= {
+    val pattern = "^[^(]*".r
+    val output = pattern.findFirstIn(input)
+    return output.get
+
+  }
+
   def main(args: Array[String]) {
     val sc = new SparkContext("local[2]", "Explore Users in Movie Dataset")
 
-    val movie_fields = sc.textFile("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/moviestream/ml-100k/u.item").map(line => line.split("\\|"))
-      .map(records => (records(0), records(1), records(2), records(3), records(4)))
+    val raw_title = org.sparksamples.Util.getMovieDataDF().select("name")
+    raw_title.show()
 
-    val num_movies = movie_fields.count()
-    println(num_movies)
+    raw_title.createOrReplaceTempView("titles")
+    Util.spark.udf.register("processRegex", processRegex _)
+    val processed_titles = Util.spark.sql("select processRegex(name) from titles")
+    processed_titles.show()
+    val titles_rdd = processed_titles.rdd.map(r => r(0).toString)
+    val y = titles_rdd.take(5)
+    println(titles_rdd.first())
 
-    val years = movie_fields.map(movie_fields => convert(movie_fields._3)).collect()
-    val years_filtered = years.filter(years => years != "1900")
-    val years_filtered_int = years_filtered.map(years_filtered => years_filtered.toInt)
+    //val title_terms = null
+    val title_terms = titles_rdd.map(x => x.split(" "))
+    title_terms.take(5).foreach(_.foreach(println))
+    println(title_terms.count())
 
-    val movie_ages = years_filtered_int.map(years_filtered_int => 1998 - years_filtered_int)
-    movie_ages.foreach(println)
+    val all_terms_dic = new ListBuffer[String]()
+    val all_terms = title_terms.flatMap(title_terms => title_terms).distinct().collect()
+    for (term <- all_terms){
+      all_terms_dic += term
+    }
 
-    val dataset1 = new HistogramDataset()
-    dataset1.setType(HistogramType.RELATIVE_FREQUENCY)
-    val movie_age_series = movie_ages.map(movie_ages => movie_ages.toDouble)
-    dataset1.addSeries("Histogram", movie_age_series, 10)
-    val plotTitle1 = "Age Histogram";
-    val xaxis1 = "age";
-    val yaxis1 = "scale";
-    val orientation1 = PlotOrientation.VERTICAL;
-    val show1 = false;
-    val toolTips1 = false;
-    val urls1 = false;
-    val chart1 = ChartFactory.createHistogram( plotTitle1, xaxis1, yaxis1, dataset1, orientation1, show1, toolTips1, urls1);
-    val width1 = 600;
-    val height1 = 400;
-    ChartUtilities.saveChartAsPNG(new File("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/moviestream/plots/movieage_histogram.png"), chart1, width1, height1);
+    println(all_terms_dic.length)
+    println(all_terms_dic.indexOf("Dead"))
+    println(all_terms_dic.indexOf("Rooms"))
 
-    val raw_title = movie_fields.map(movie_fields => movie_fields._2)
-    val pattern = "^[^(]*".r
-    val proc_title = raw_title.map(raw_title => pattern.findFirstIn(raw_title))
-    val title = proc_title.map(proc_title => proc_title.get.trim)
+    val all_terms_withZip = title_terms.flatMap(title_terms => title_terms).distinct().zipWithIndex().collectAsMap()
+    println(all_terms_withZip.get("Dead"))
+    println(all_terms_withZip.get("Rooms"))
+
+    val word2vec = new Word2Vec()
+    val rdd_terms = titles_rdd.map(title => title.split(" ").toSeq)
+    val model = word2vec.fit(rdd_terms)
+    println(model.findSynonyms("Dead", 40))
+
+    val term_vectors = title_terms.map(title_terms => create_vector(title_terms, all_terms_dic))
+    term_vectors.take(5).foreach(println)
+
+
+
+    //val raw_title = movie_fields.map(movie_fields => movie_fields._2)
+    //val pattern = "^[^(]*".r
+    //val x = raw_title.filter("\"name\" rlike \"^[^(]*\"")
+    //x.show()
+    //val proc_title = raw_title.map(raw_title => pattern.findFirstIn(raw_title(0)))
+    /*val title = proc_title.map(proc_title => proc_title.get.trim)
     title.take(5).foreach(println)
 
     val title_terms = title.map(title => title.split(" "))
@@ -78,7 +93,7 @@ object explore_movies {
     println(model.findSynonyms("Dead", 40))
 
     val term_vectors = title_terms.map(title_terms => create_vector(title_terms, all_terms_dic))
-    term_vectors.take(5).foreach(println)
+    term_vectors.take(5).foreach(println)*/
 
     sc.stop()
   }

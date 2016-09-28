@@ -26,7 +26,7 @@ object MovieDataFillingBadValues {
     Util.sc.broadcast(mean)
     println("Mean value of Year:" + mean)
     println("Median value of Year:" + median_v)
-    val years_x = years_replaced.map(v => replace(v , median_v))
+    val years_x = years_replaced.map(v =>   replace(v , median_v))
     println("Total Years after conversion:" + years_x.count())
     var count = 0
     Util.sc.broadcast(count)

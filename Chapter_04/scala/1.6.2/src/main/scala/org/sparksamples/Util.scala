@@ -9,6 +9,7 @@ import org.apache.spark.rdd.RDD
   */
 object Util {
   val PATH = "../../"
+  val MOVIE_DATA = PATH + "/data/ml-100k/u.item"
   val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
   val sc = new SparkContext(spConfig)
 

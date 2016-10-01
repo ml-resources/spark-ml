@@ -8,6 +8,7 @@ import scala.collection.mutable.ListBuffer
 
 /**
   * Created by manpreet.singh on 27/02/16.
+  * Modified by Rajdeep on 01/1016
   */
 object explore_movies {
 
@@ -30,6 +31,7 @@ object explore_movies {
     processed_titles.show()
     val titles_rdd = processed_titles.rdd.map(r => r(0).toString)
     val y = titles_rdd.take(5)
+    titles_rdd.take(5).foreach(println)
     println(titles_rdd.first())
 
     //val title_terms = null
@@ -58,42 +60,6 @@ object explore_movies {
 
     val term_vectors = title_terms.map(title_terms => create_vector(title_terms, all_terms_dic))
     term_vectors.take(5).foreach(println)
-
-
-
-    //val raw_title = movie_fields.map(movie_fields => movie_fields._2)
-    //val pattern = "^[^(]*".r
-    //val x = raw_title.filter("\"name\" rlike \"^[^(]*\"")
-    //x.show()
-    //val proc_title = raw_title.map(raw_title => pattern.findFirstIn(raw_title(0)))
-    /*val title = proc_title.map(proc_title => proc_title.get.trim)
-    title.take(5).foreach(println)
-
-    val title_terms = title.map(title => title.split(" "))
-    title_terms.take(5).foreach(_.foreach(println))
-    println(title_terms.count())
-
-    val all_terms_dic = new ListBuffer[String]()
-    val all_terms = title_terms.flatMap(title_terms => title_terms).distinct().collect()
-    for (term <- all_terms){
-      all_terms_dic += term
-    }
-
-    println(all_terms_dic.length)
-    println(all_terms_dic.indexOf("Dead"))
-    println(all_terms_dic.indexOf("Rooms"))
-
-    val all_terms_withZip = title_terms.flatMap(title_terms => title_terms).distinct().zipWithIndex().collectAsMap()
-    println(all_terms_withZip.get("Dead"))
-    println(all_terms_withZip.get("Rooms"))
-
-    val word2vec = new Word2Vec()
-    val rdd_terms = title.map(title => title.split(" ").toSeq)
-    val model = word2vec.fit(rdd_terms)
-    println(model.findSynonyms("Dead", 40))
-
-    val term_vectors = title_terms.map(title_terms => create_vector(title_terms, all_terms_dic))
-    term_vectors.take(5).foreach(println)*/
 
     sc.stop()
   }

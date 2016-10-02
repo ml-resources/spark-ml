@@ -2,93 +2,86 @@ package org.sparksamples
 
 /**
   * Created by Rajdeep on 12/22/15.
+  * Modified by Rajdeep on 09/19/16
   */
 import java.util.Date
 
 import breeze.linalg.DenseVector
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 
 object RatingData {
-  val user_data = Util.getUserData()
   def main(args: Array[String]) {
-    val rating_data_raw = Util.sc.textFile("../../data/ml-100k/u.data")
-    println(rating_data_raw.first())
-    val num_ratings = rating_data_raw.count()
+
+    val customSchema = StructType(Array(
+      StructField("user_id", IntegerType, true),
+      StructField("movie_id", IntegerType, true),
+      StructField("rating", IntegerType, true),
+      StructField("timestamp", IntegerType, true)))
+
+    val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
+    val spark = SparkSession
+      .builder()
+      .appName("SparkRatingData").config(spConfig)
+      .getOrCreate()
+
+    val rating_df = spark.read.format("com.databricks.spark.csv")
+      .option("delimiter", "\t").schema(customSchema)
+      .load("../../data/ml-100k/u.data")
+    rating_df.createOrReplaceTempView("df")
+    val num_ratings = rating_df.count()
+    val num_movies = Util.getMovieDataDF().count()
+    val first = rating_df.first()
+    println("first:" + first)
     println("num_ratings:" + num_ratings)
-    val rating_data = rating_data_raw.map(line => line.split("\t"))
 
-    val ratings = rating_data.map(fields => fields(2).toInt)
-    val max_rating = ratings.reduce( (x, y) => math.max(x, y))
-    val min_rating = ratings.reduce( (x, y) => math.min(x, y))
-    val mean_rating = ratings.reduce( (x, y) => x + y) / num_ratings.toFloat
-    println("max_rating: " + max_rating)
-    println("min_rating: " + min_rating)
-    println("mean_rating: " + mean_rating)
+    val max = Util.spark.sql("select max(rating)  from df")
+    max.show()
 
-    println("user_data.first():"  + user_data.first())
-    val user_fields = user_data.map(l => l.split("\\|"))
+    val min = Util.spark.sql("select min(rating)  from df")
+    min.show()
 
-    val num_users = user_fields.map(l => l(0)).count()
-    //val median_rating = math.median(ratings.collect()) function not supported - TODO
-    val ratings_per_user = num_ratings / num_users
-    println("ratings per user: " + ratings_per_user)
+    val avg = Util.spark.sql("select avg(rating)  from df")
+    avg.show()
 
-    val num_movies = Util.getMovieData().count()
-    val ratings_per_movie = num_ratings / num_movies
-    println("ratings per movie: " + ratings_per_movie)
-    val count_by_rating = ratings.countByValue()
-    println("count_by_rating: + " + count_by_rating)
+    val ratings_grouped = rating_df.groupBy("rating")
+    ratings_grouped.count().show()
+    val ratings_byuser_local = rating_df.groupBy("user_id").count()
+    val count_ratings_byuser_local = ratings_byuser_local.count()
+    ratings_byuser_local.show(ratings_byuser_local.collect().length)
+    val movie_fields_df = Util.getMovieDataDF()
+    val user_data_df = Util.getUserFieldDataFrame()
+    val occupation_df = user_data_df.select("occupation").distinct()
+    occupation_df.sort("occupation").show()
+    val occupation_df_collect = occupation_df.collect()
 
-    println(ratings.stats())
-
-    val user_ratings_grouped = rating_data.map(fields => (fields(0).toInt, fields(2).toInt)).groupByKey()
-    //Python code : user_ratings_byuser = user_ratings_grouped.map(lambda (k, v): (k, len(v)))
-    val user_ratings_byuser = user_ratings_grouped.map(v =>  (v._1,v._2.size))
-    val user_ratings_byuser_take5 = user_ratings_byuser.take(5)
-    user_ratings_byuser_take5.foreach(println)
-    val user_ratings_byuser_local = user_ratings_byuser.map(v =>  v._2).collect()
-    val movie_fields = Util.movieFields()
-
-    //TODO - Change the python code below
-    //idx_bad_data = np.where(years_pre_processed_array==1900)[0][0]
-    //years_pre_processed_array[idx_bad_data] = median_year
-
-    //Feature Extraction
-    //Categorical Features: _1-of-k_ Encoding of User Occupation
-
-    val all_occupations = user_fields.map(fields=> fields(3)).distinct().collect()
-    scala.util.Sorting.quickSort(all_occupations)
-
-    var all_occupations_dict:Map[String, Int] = Map()
+    var all_occupations_dict_1:Map[String, Int] = Map()
     var idx = 0;
     // for loop execution with a range
-    for( idx <- 0 to (all_occupations.length -1)){
-      all_occupations_dict += all_occupations(idx) -> idx
+    for( idx <- 0 to (occupation_df_collect.length -1)){
+      all_occupations_dict_1 += occupation_df_collect(idx)(0).toString() -> idx
     }
 
-    println("Encoding of 'doctor : " + all_occupations_dict("doctor"))
-    println("Encoding of 'programmer' : " + all_occupations_dict("programmer"))
-    /*
-    K = len(all_occupations_dict)
-    binary_x = np.zeros(K)
-    k_programmer = all_occupations_dict['programmer']
-    binary_x[k_programmer] = 1
-    print "Binary feature vector: %s" % binary_x
-    print "Length of binary vector: %d" % K
-     */
-    val k = all_occupations_dict.size
-    val binary_x = DenseVector.zeros[Double](k)
-    val k_programmer = all_occupations_dict("programmer")
+    println("Encoding of 'doctor : " + all_occupations_dict_1("doctor"))
+    println("Encoding of 'programmer' : " + all_occupations_dict_1("programmer"))
+
+    var k = all_occupations_dict_1.size
+    var binary_x = DenseVector.zeros[Double](k)
+    var k_programmer = all_occupations_dict_1("programmer")
     binary_x(k_programmer) = 1
     println("Binary feature vector: %s" + binary_x)
     println("Length of binary vector: " + k)
 
-    val timestamps = rating_data.map(fields=> fields(3))
-    val hour_of_day = timestamps.map(ts => getCurrentHour(ts))
-    println(hour_of_day.take(5).foreach(println))
+    Util.spark.udf.register("getCurrentHour", getCurrentHour _)
 
-    //time_of_day = hour_of_day.map(lambda hr: assign_tod(hr))
-    val time_of_day = hour_of_day.map(hr => assignTod(hr))
-    println(time_of_day.take(5).foreach(println))
+    val timestamps_df =  Util.spark.sql("select getCurrentHour(timestamp) as hour from df")
+    timestamps_df.show()
+
+    Util.spark.udf.register("assignTod", assignTod _)
+    timestamps_df.createOrReplaceTempView("timestamps")
+    val tod = Util.spark.sql("select assignTod(hour) as tod from timestamps")
+    tod.show()
 
   }
 
@@ -103,20 +96,6 @@ object RatingData {
     }
     return 1
   }
-
-  /*
-  def assign_tod(hr):
-    times_of_day = {
-                'morning' : range(7, 12),
-                'lunch' : range(12, 14),
-                'afternoon' : range(14, 18),
-                'evening' : range(18, 23),
-                'night' : range(23, 7)
-                }
-    for k, v in times_of_day.iteritems():
-        if hr in v:
-            return k
-   */
 
   def assignTod(hr : Integer) : String = {
     if(hr >= 7 && hr < 12){

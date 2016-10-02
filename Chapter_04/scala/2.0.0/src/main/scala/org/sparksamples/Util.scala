@@ -1,9 +1,9 @@
 package org.sparksamples
 
+import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
   * Created by Rajdeep Dua on 2/2/16.
@@ -11,42 +11,28 @@ import org.apache.spark.{SparkConf, SparkContext}
 object Util {
   val PATH = "../.."
   val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
-  val sc = new SparkContext(spConfig)
+  //val sc = new SparkContext(spConfig)
   val spark = SparkSession
-    .builder()
-    .appName("Spark SQL Example")
+    .builder().master("local")
+    .appName("Spark 2.0.0")
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
+
+  val sc = spark.sparkContext
 
   val PATH_MOVIES = PATH + "/data/ml-100k/u.item"
   val PATH_USERS = PATH + "/data/ml-100k/u.user"
 
-  val sqlContext = new SQLContext(org.sparksamples.Util.sc)
+  //val sqlContext = new SQLContext(org.sparksamples.Util.sc)
 
   def getMovieData() : RDD[String] = {
-    val movie_data = sc.textFile(PATH + "/data/ml-100k/u.item")
-    return movie_data
+    //val movie_data = sc.textFile(PATH + "/data/ml-100k/u.item")
+    //return movie_data
+    return null
   }
 
   def getMovieDataDF() : DataFrame = {
-    //val PATH = "/home/ubuntu/work/ml-resources/spark-ml/data/ml-100k/u.item"
-    /*import org.apache.spark.sql.Row
 
-    val sqlContext = new SQLContext(org.sparksamples.Util.sc)
-
-    val rowRdd = sqlContext.sparkContext.textFile(PATH_MOVIES).map { line =>
-      val tokens = line.split('|')
-      Row(org.sparksamples.Util.convertYear(tokens(2)))
-    }
-    return rowRdd*/
-    case class Movie(name: String, age: Long)
-
-    /*val movieDF = spark.read
-      .textFile(PATH_MOVIES)
-      .map(_.split("|"))
-      .map(attributes => Movie(attributes(0), attributes(1).trim.toInt))
-      .toDF()
-    return movieDF*/
     //1|Toy Story (1995)|01-Jan-1995||http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)
     // |0|0|0|1|1|1|0|0|0|0|0|0|0|0|0|0|0|0|0
     val customSchema = StructType(Array(
@@ -118,7 +104,7 @@ object Util {
   }
 
   def getUserData() : RDD[String] = {
-    var user_data = Util.sc.textFile(PATH + "/data/ml-100k/u.user")
+    var user_data = Util.spark.sparkContext.textFile(PATH + "/data/ml-100k/u.user")
     return user_data
   }
 

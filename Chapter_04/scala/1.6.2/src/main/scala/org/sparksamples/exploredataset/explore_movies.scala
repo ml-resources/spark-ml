@@ -1,13 +1,11 @@
 package org.sparksamples.exploredataset
 
-import java.io.File
-
 import breeze.linalg.CSCMatrix
-import org.apache.spark.SparkContext
 import org.apache.spark.mllib.feature.Word2Vec
+import org.jfree.chart.ChartFactory
 import org.jfree.chart.plot.PlotOrientation
-import org.jfree.chart.{ChartFactory, ChartUtilities}
 import org.jfree.data.statistics.{HistogramDataset, HistogramType}
+import org.sparksamples.Util
 
 import scala.collection.mutable.ListBuffer
 
@@ -17,9 +15,9 @@ import scala.collection.mutable.ListBuffer
 object explore_movies {
 
   def main(args: Array[String]) {
-    val sc = new SparkContext("local[2]", "Explore Users in Movie Dataset")
+    val sc = Util.sc
 
-    val movie_fields = sc.textFile("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/moviestream/ml-100k/u.item").map(line => line.split("\\|"))
+    val movie_fields = sc.textFile(Util.MOVIE_DATA).map(line => line.split("\\|"))
       .map(records => (records(0), records(1), records(2), records(3), records(4)))
 
     val num_movies = movie_fields.count()
@@ -46,7 +44,7 @@ object explore_movies {
     val chart1 = ChartFactory.createHistogram( plotTitle1, xaxis1, yaxis1, dataset1, orientation1, show1, toolTips1, urls1);
     val width1 = 600;
     val height1 = 400;
-    ChartUtilities.saveChartAsPNG(new File("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/moviestream/plots/movieage_histogram.png"), chart1, width1, height1);
+    //ChartUtilities.saveChartAsPNG(new File("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/breeze.io/src/main/scala/moviestream/plots/movieage_histogram.png"), chart1, width1, height1);
 
     val raw_title = movie_fields.map(movie_fields => movie_fields._2)
     val pattern = "^[^(]*".r

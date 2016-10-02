@@ -10,6 +10,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
   */
 object Util {
   val PATH = "../.."
+  //TODO Replace with your specific spark home
+  val SPARK_HOME ="/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
   val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
   //val sc = new SparkContext(spConfig)
   val spark = SparkSession

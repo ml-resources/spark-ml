@@ -4,6 +4,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.mllib.feature.HashingTF
 import org.apache.spark.mllib.feature.IDF
+import org.sparksamples.Util
 /**
   * @author Rajdeep Dua
   *         March 4 2016
@@ -11,7 +12,7 @@ import org.apache.spark.mllib.feature.IDF
 object TfIdfSample{
   def main(args: Array[String]) {
     //TODO replace with path specific to your machine
-    val file = "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6//README.md"
+    val file = Util.SPARK_HOME + "/README.md"
     val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
     val sc = new SparkContext(spConfig)
     val documents: RDD[Seq[String]] = sc.textFile(file).map(_.split(" ").toSeq)

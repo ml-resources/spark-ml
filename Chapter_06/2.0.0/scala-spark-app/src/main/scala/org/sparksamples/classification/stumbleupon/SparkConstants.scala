@@ -5,6 +5,6 @@ package org.sparksamples.classification.stumbleupon
   */
 object SparkConstants {
 
-  val SparkMaster = "local[2]"
+  val SparkMaster = "local[1]"
 
 }

@@ -48,4 +48,3 @@ object MultilayerPerceptronClassifierExample {
     spark.stop()
   }
 }
-// scalastyle:on println

@@ -1,13 +1,11 @@
-// scalastyle:off println
 package org.sparksamples.classification.stumbleupon
 
-// $example on$
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.ml.classification.{BinaryLogisticRegressionSummary, LogisticRegression}
-// $example off$
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.max
 
+// set VM Option as -Dspark.master=local[1]
 object LogisticRegressionSummaryExample {
 
   def main(args: Array[String]): Unit = {
@@ -18,7 +16,7 @@ object LogisticRegressionSummaryExample {
     import spark.implicits._
 
     // Load training data
-    val training = spark.read.format("libsvm").load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_06/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/classification/stumbleupon/sample_libsvm_data.txt")
+    val training = spark.read.format("libsvm").load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_06/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/classification/dataset/spark-data/sample_libsvm_data.txt")
 
     val lr = new LogisticRegression()
       .setMaxIter(10)
@@ -28,7 +26,6 @@ object LogisticRegressionSummaryExample {
     // Fit the model
     val lrModel = lr.fit(training)
 
-    // $example on$
     // Extract the summary from the returned LogisticRegressionModel instance trained in the earlier
     // example
     val trainingSummary = lrModel.summary
@@ -54,9 +51,7 @@ object LogisticRegressionSummaryExample {
     val bestThreshold = fMeasure.where($"F-Measure" === maxFMeasure)
       .select("threshold").head().getDouble(0)
     lrModel.setThreshold(bestThreshold)
-    // $example off$
 
     spark.stop()
   }
 }
-// scalastyle:on println

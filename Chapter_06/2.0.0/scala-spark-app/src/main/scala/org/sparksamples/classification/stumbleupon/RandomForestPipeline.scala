@@ -2,9 +2,9 @@ package org.sparksamples.classification.stumbleupon
 
 import org.apache.log4j.Logger
 import org.apache.spark.ml.classification.RandomForestClassifier
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler}
 import org.apache.spark.ml.{Pipeline, PipelineStage}
-import org.apache.spark.mllib.evaluation.{MulticlassMetrics, RegressionMetrics}
 import org.apache.spark.sql.DataFrame
 
 import scala.collection.mutable
@@ -51,34 +51,13 @@ object RandomForestPipeline {
     //val holdout = model.transform(test).select("prediction","label")
     val holdout = model.transform(dataFrame).select("prediction","label")
 
-    // have to do a type conversion for RegressionMetrics
-    val rm = new RegressionMetrics(holdout.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double])))
+    // Select (prediction, true label) and compute test error
+    val evaluator = new MulticlassClassificationEvaluator()
+      .setLabelCol("label")
+      .setPredictionCol("prediction")
+      .setMetricName("accuracy")
+    val mAccuracy = evaluator.evaluate(holdout)
+    println("Test set accuracy = " + mAccuracy)
 
-    logger.info("Test Metrics")
-    logger.info("Test Explained Variance:")
-    logger.info(rm.explainedVariance)
-    logger.info("Test R^2 Coef:")
-    logger.info(rm.r2)
-    logger.info("Test MSE:")
-    logger.info(rm.meanSquaredError)
-    logger.info("Test RMSE:")
-    logger.info(rm.rootMeanSquaredError)
-
-    val predictions = model.transform(test).select("prediction").rdd.map(_.getDouble(0))
-    val labels = model.transform(test).select("label").rdd.map(_.getDouble(0))
-    val accuracy = new MulticlassMetrics(predictions.zip(labels)).precision
-    println(s"  Accuracy : $accuracy")
-
-    holdout.rdd.map(x => x(0).asInstanceOf[Double]).repartition(1).saveAsTextFile("/home/ubuntu/work/ml-resources/spark-ml/results/RF.xls")
-
-    savePredictions(holdout, test, rm, "/home/ubuntu/work/ml-resources/spark-ml/results/RandomForest.csv")
-  }
-
-  def savePredictions(predictions:DataFrame, testRaw:DataFrame, regressionMetrics: RegressionMetrics, filePath:String) = {
-    predictions
-      .coalesce(1)
-      .write.format("com.databricks.spark.csv")
-      .option("header", "true")
-      .save(filePath)
   }
 }

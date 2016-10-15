@@ -5,7 +5,7 @@ import org.apache.spark.mllib.feature.Word2Vec
 
 object ConvertWordsToVectors{
   def main(args: Array[String]) {
-    val file = "/home/ubuntu/work/rajdeepd-spark-ml/spark-ml/Chapter_04/data/text8_10000"
+    val file = "/home/ubuntu/work/ml-resources/spark-ml/Chapter_04/data/text8_10000"
     val conf = new SparkConf().setMaster("local").setAppName("Word2Vector")
     val sc = new SparkContext(conf)
     val input = sc.textFile(file).map(line => line.split(" ").toSeq)

@@ -7,7 +7,8 @@ object StandardScalarSample {
   def main(args: Array[String]) {
     val conf = new SparkConf().setMaster("local").setAppName("Word2Vector")
     val sc = new SparkContext(conf)
-    val data = MLUtils.loadLibSVMFile(sc, "/home/ubuntu/work/spark-1.6.0-bin-hadoop2.6/data/mllib/sample_libsvm_data.txt")
+    val data = MLUtils.loadLibSVMFile(sc,
+      org.sparksamples.Util.SPARK_HOME +  "/data/mllib/sample_libsvm_data.txt")
 
     val scaler1 = new StandardScaler().fit(data.map(x => x.features))
     val scaler2 = new StandardScaler(withMean = true, withStd = true).fit(data.map(x => x.features))

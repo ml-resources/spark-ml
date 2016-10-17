@@ -6,6 +6,7 @@ import org.apache.spark.mllib.linalg.Vector
   * Created by Rajdeep Dua on 6/12/16.
   */
 object Util {
+  val PATH = "/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
   def reduceDimension2(x: Vector) : String= {
     var i = 0
     var l = x.toArray.size

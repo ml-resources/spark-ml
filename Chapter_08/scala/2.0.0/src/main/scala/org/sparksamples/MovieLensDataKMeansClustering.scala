@@ -7,7 +7,7 @@ import org.apache.spark.{SparkConf, SparkContext}
   * @author Rajdeep Dua
   */
 object MovieLensDataKMeansClustering {
-  val PATH= "../data/ml-100k"
+  val PATH= "../../../data/ml-100k"
   def main(args: Array[String]): Unit = {
     val spConfig = (new SparkConf).setMaster("local[1]").setAppName("SparkApp").
       set("spark.driver.allowMultipleContexts", "true")

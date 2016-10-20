@@ -14,7 +14,7 @@ import org.apache.spark.sql.SparkSession
   */
 object BisectingKMeans {
   val PATH = "/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
-  val BASE = "./OUTPUT/13_10_2016_12_46_05"
+  val BASE = "./OUTPUT/20_10_2016_04_12_52_base_2f"
 
   def main(args: Array[String]): Unit = {
 

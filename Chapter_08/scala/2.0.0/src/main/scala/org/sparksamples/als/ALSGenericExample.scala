@@ -29,7 +29,7 @@ import org.apache.spark.ml.recommendation.ALS
  * An example demonstrating ALS.
  */
 object ALSGenericExample {
-  val PATH = "/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/";
+  val SPARK_PATH = "/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/";
 
   case class Rating(userId: Int, movieId: Int, rating: Float, timestamp: Long)
   def parseRating(str: String): Rating = {
@@ -54,7 +54,7 @@ object ALSGenericExample {
 
     // Create an RDD of Person objects from a text file, convert it to a Dataframe
     val ratings = spark.sparkContext
-      .textFile(PATH + "data/mllib/als/sample_movielens_ratings.txt")
+      .textFile(SPARK_PATH + "data/mllib/als/sample_movielens_ratings.txt")
       .map(_.split("::"))
       .map(lineSplit => Rating(lineSplit(0).toInt, lineSplit(1).toInt, lineSplit(2).toFloat, lineSplit(3).toLong))
       .toDF()

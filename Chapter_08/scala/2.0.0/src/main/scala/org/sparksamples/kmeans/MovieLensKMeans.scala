@@ -43,12 +43,14 @@ object MovieLensKMeans {
       .getOrCreate()
 
     val datasetUsers = spark.read.format("libsvm").load(
-      "./OUTPUT/11_10_2016_10_28_56/movie_lens_users_libsvm/part-00000")
+      "./data/movie_lens_libsvm/movie_lens_users_libsvm/part-00000")
     datasetUsers.show(3)
 
     val kmeans = new KMeans().setK(5).setSeed(1L)
 
     val modelUsers = kmeans.fit(datasetUsers)
+    val predictedUserClusters = modelUsers.transform(datasetUsers)
+    predictedUserClusters.show(5)
 
     // Evaluate clustering by computing Within Set Sum of Squared Errors.
     val WSSSEUsers = modelUsers.computeCost(datasetUsers)
@@ -59,7 +61,7 @@ object MovieLensKMeans {
     modelUsers.clusterCenters.foreach(println)
 
     val datasetItems = spark.read.format("libsvm").load(
-      "./OUTPUT/11_10_2016_10_28_56/movie_lens_users_libsvm/part-00000")
+      "./data/movie_lens_libsvm/movie_lens_users_libsvm/part-00000")
     datasetItems.show(3)
 
     val kmeansItems = new KMeans().setK(5).setSeed(1L)

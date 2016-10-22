@@ -32,7 +32,7 @@ import org.apache.spark.sql.SparkSession
  */
 object MovieLensKMeansPersist {
   //val BASE = "./OUTPUT/12_10_2016_09_00_50"
-  val BASE= "./OUTPUT/13_10_2016_12_46_05"
+  val BASE= "./data/movie_lens_libsvm_2f"
   val time = System.currentTimeMillis()
   val formatter = new SimpleDateFormat("dd_MM_yyyy_hh_mm_ss")
 

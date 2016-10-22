@@ -15,7 +15,7 @@ import org.apache.spark.sql.SparkSession
   */
 object BisectingKMeansPersist {
   val PATH = "/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
-  val BASE = "./OUTPUT/20_10_2016_04_12_52_base_2f"
+  val BASE = "./data/movie_lens_libsvm_2f"
 
   val time = System.currentTimeMillis()
   val formatter = new SimpleDateFormat("dd_MM_yyyy_hh_mm_ss")
@@ -44,6 +44,8 @@ object BisectingKMeansPersist {
     bKMeansUsers.setMinDivisibleClusterSize(5)
 
     val modelUsers = bKMeansUsers.fit(datasetUsers)
+    val predictedUserClusters = modelUsers.transform(datasetUsers)
+    predictedUserClusters.show(5)
 
     // Evaluate clustering by computing Within Set Sum of Squared Errors.
     val WSSSEUsers = modelUsers.computeCost(datasetUsers)

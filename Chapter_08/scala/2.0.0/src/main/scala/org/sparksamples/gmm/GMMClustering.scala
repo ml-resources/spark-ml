@@ -42,7 +42,7 @@ object GMMClustering {
       .getOrCreate()
 
     val datasetUsers = spark.read.format("libsvm").load(
-      "./OUTPUT/11_10_2016_10_12_24/movie_lens_users_libsvm/part-00000")
+      "./data/movie_lens_libsvm/movie_lens_users_libsvm/part-00000")
     datasetUsers.show(3)
 
     val gmmUsers = new GaussianMixture().setK(5).setSeed(1L)
@@ -54,7 +54,7 @@ object GMMClustering {
     }
 
     val dataSetItems = spark.read.format("libsvm").load(
-      "./OUTPUT/11_10_2016_10_12_24/movie_lens_items_libsvm/part-00000")
+      "./data/movie_lens_libsvm/movie_lens_items_libsvm/part-00000")
 
     val gmmItems = new GaussianMixture().setK(5).setSeed(1L)
     val modelItems = gmmItems.fit(dataSetItems)

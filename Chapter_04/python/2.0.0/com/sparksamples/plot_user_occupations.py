@@ -29,9 +29,11 @@ def main():
     ax.set_xticklabels(x_axis)
 
     plt.bar(pos, y_axis, width, color='lightblue')
-    plt.xticks(rotation=30)
-    fig = matplotlib.pyplot.gcf()
-    fig.set_size_inches(20, 10)
+    plt.xticks(rotation=45, fontsize='9')
+    plt.gcf().subplots_adjust(bottom=0.15)
+    #fig = matplotlib.pyplot.gcf()
+
+
     plt.show()
 
 

@@ -22,14 +22,19 @@ package org.sparksamples.kmeans
 // $example on$
 import org.apache.spark.SparkConf
 import org.apache.spark.ml.clustering.KMeans
+import org.sparksamples.als.ALSMovieLens.Rating
 // $example off$
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.DataFrame
+
 
 /**
  */
 object MovieLensKMeans {
-
+  case class RatingX(userId: Int, movieId: Int, rating: Float, timestamp: Long)
+  val DATA_PATH= "../../../data/ml-100k"
+  val PATH_MOVIES = DATA_PATH + "/u.item"
 
   def main(args: Array[String]): Unit = {
 
@@ -41,10 +46,16 @@ object MovieLensKMeans {
       .appName("Spark SQL Example")
       .config(spConfig)
       .getOrCreate()
+    import spark.implicits._
+
+
+    // Shows the re
 
     val datasetUsers = spark.read.format("libsvm").load(
       "./data/movie_lens_libsvm/movie_lens_users_libsvm/part-00000")
     datasetUsers.show(3)
+
+    val x = datasetUsers.columns
 
     val kmeans = new KMeans().setK(5).setSeed(1L)
 
@@ -52,17 +63,23 @@ object MovieLensKMeans {
     val predictedUserClusters = modelUsers.transform(datasetUsers)
     predictedUserClusters.show(5)
 
+    val movieDF = getMovieDataDF(spark)
+
+    val joinedMovieDFAndPredictedCluster = movieDF.join(predictedUserClusters,predictedUserClusters("label") === movieDF("id"))
+    print(joinedMovieDFAndPredictedCluster.first())
+    joinedMovieDFAndPredictedCluster.show(5)
+
     // Evaluate clustering by computing Within Set Sum of Squared Errors.
     val WSSSEUsers = modelUsers.computeCost(datasetUsers)
     println(s"Users :  Within Set Sum of Squared Errors = $WSSSEUsers")
 
-    // Shows the result.
     println("Users : Cluster Centers: ")
     modelUsers.clusterCenters.foreach(println)
 
     val datasetItems = spark.read.format("libsvm").load(
       "./data/movie_lens_libsvm/movie_lens_users_libsvm/part-00000")
     datasetItems.show(3)
+    
 
     val kmeansItems = new KMeans().setK(5).setSeed(1L)
 
@@ -78,6 +95,23 @@ object MovieLensKMeans {
 
     spark.stop()
   }
+  import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+
+  def getMovieDataDF(spark : SparkSession) : DataFrame = {
+
+    //1|Toy Story (1995)|01-Jan-1995||http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)
+    // |0|0|0|1|1|1|0|0|0|0|0|0|0|0|0|0|0|0|0
+    val customSchema = StructType(Array(
+      StructField("id", StringType, true),
+      StructField("name", StringType, true),
+      StructField("date", StringType, true),
+      StructField("url", StringType, true)));
+    val movieDf = spark.read.format("com.databricks.spark.csv")
+      .option("delimiter", "|").schema(customSchema)
+      .load(PATH_MOVIES)
+    return movieDf
+  }
+
 
   def loadInLibSVMFormat(line: String, noOfFeatures : Int) : LabeledPoint = {
     val items = line.split(' ')

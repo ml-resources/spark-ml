@@ -77,6 +77,7 @@ object ALSMovieLens {
       .map(_.split("\t"))
       .map(lineSplit => Rating(lineSplit(0).toInt, lineSplit(1).toInt, lineSplit(2).toFloat, lineSplit(3).toLong))
       .toDF()
+    ratings.show(5)
 
     val Array(training, test) = ratings.randomSplit(Array(0.8, 0.2))
 

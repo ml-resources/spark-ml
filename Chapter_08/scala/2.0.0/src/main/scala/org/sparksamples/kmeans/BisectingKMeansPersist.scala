@@ -37,7 +37,7 @@ object BisectingKMeansPersist {
       .getOrCreate()
 
     val datasetUsers = spark.read.format("libsvm").load(
-      BASE + "/movie_lens_2f_users_libsvm/part-00000")
+      BASE + "/movie_lens_2f_users_xy/part-00000")
     datasetUsers.show(3)
     val bKMeansUsers = new BisectingKMeans()
     bKMeansUsers.setMaxIter(10)
@@ -53,7 +53,7 @@ object BisectingKMeansPersist {
 
 
     val datasetItems = spark.read.format("libsvm").load(BASE +
-      "/movie_lens_2f_items_libsvm/part-00000")
+      "/movie_lens_2f_items_xy/part-00000")
     datasetItems.show(3)
 
     val kmeansItems = new BisectingKMeans().setK(5).setSeed(1L)

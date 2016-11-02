@@ -18,13 +18,12 @@
 package org.sparksamples.kmeans
 
 import org.apache.spark.SparkConf
-import org.apache.spark.ml.clustering.KMeans
-
+import org.apache.spark.ml.clustering.{BisectingKMeans, KMeans}
 import org.apache.spark.sql.SparkSession
 
 /**
  */
-object MovieLensKMeansMetrics {
+object BisectingKMeansMetrics {
   case class RatingX(userId: Int, movieId: Int, rating: Float, timestamp: Long)
   val DATA_PATH= "../../../data/ml-100k"
   val PATH_MOVIES = DATA_PATH + "/u.item"
@@ -49,7 +48,7 @@ object MovieLensKMeansMetrics {
     val itr = Array(1,10,20,50,75,100)
     val result = new Array[String](itr.length)
     for(i <- 0 until itr.length){
-      val w = calculateWSSSE(spark,datasetUsers,itr(i),5,1L)
+      val w = calculateWSSSE(spark,datasetUsers,itr(i),5)
       result(i) = itr(i) + "," + w
     }
     println("----------Users----------")
@@ -62,7 +61,7 @@ object MovieLensKMeansMetrics {
       "./data/movie_lens_libsvm/movie_lens_items_libsvm/part-00000")
     val resultItems = new Array[String](itr.length)
     for(i <- 0 until itr.length){
-      val w = calculateWSSSE(spark,datasetItems,itr(i),5,1L)
+      val w = calculateWSSSE(spark,datasetItems,itr(i),5)
       resultItems(i) = itr(i) + "," + w
     }
 
@@ -78,15 +77,19 @@ object MovieLensKMeansMetrics {
 
   import org.apache.spark.sql.DataFrame
 
-  def calculateWSSSE(spark : SparkSession, dataset : DataFrame, iterations : Int, k : Int,
-                     seed : Long) : Double = {
+  def calculateWSSSE(spark : SparkSession, dataset : DataFrame, iterations : Int, k : Int) : Double =
+  {
     val x = dataset.columns
 
-    val kmeans = new KMeans().setK(k).setSeed(seed).setMaxIter(iterations)
+    //val kmeans = new KMeans().setK(k).setSeed(seed).setMaxIter(iterations)
 
-    val model = kmeans.fit(dataset)
-    val WSSSEUsers = model.computeCost(dataset)
-    return WSSSEUsers
+    val bKMeans = new BisectingKMeans()
+    bKMeans.setMaxIter(iterations)
+    bKMeans.setMinDivisibleClusterSize(k)
+
+    val model = bKMeans.fit(dataset)
+    val WSSSE = model.computeCost(dataset)
+    return WSSSE
 
   }
 }

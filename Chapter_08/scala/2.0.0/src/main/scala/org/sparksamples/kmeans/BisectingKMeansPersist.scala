@@ -37,7 +37,7 @@ object BisectingKMeansPersist {
       .getOrCreate()
 
     val datasetUsers = spark.read.format("libsvm").load(
-      BASE + "/movie_lens_2f_users_libsvm/part-00000")
+      BASE + "/movie_lens_2f_users_xy/part-00000")
     datasetUsers.show(3)
     val bKMeansUsers = new BisectingKMeans()
     bKMeansUsers.setMaxIter(10)
@@ -45,14 +45,7 @@ object BisectingKMeansPersist {
 
     val modelUsers = bKMeansUsers.fit(datasetUsers)
     val predictedUserClusters = modelUsers.transform(datasetUsers)
-    predictedUserClusters.show(5)
 
-    // Evaluate clustering by computing Within Set Sum of Squared Errors.
-    val WSSSEUsers = modelUsers.computeCost(datasetUsers)
-    println(s"Users :  Within Set Sum of Squared Errors = $WSSSEUsers")
-
-    // Shows the result.
-    println("Users : Cluster Centers: ")
     modelUsers.clusterCenters.foreach(println)
     val predictedDataSetUsers = modelUsers.transform(datasetUsers)
     val predictionsUsers = predictedDataSetUsers.select("prediction").rdd.map(x=> x(0))
@@ -60,20 +53,12 @@ object BisectingKMeansPersist {
 
 
     val datasetItems = spark.read.format("libsvm").load(BASE +
-      "/movie_lens_2f_items_libsvm/part-00000")
+      "/movie_lens_2f_items_xy/part-00000")
     datasetItems.show(3)
 
     val kmeansItems = new BisectingKMeans().setK(5).setSeed(1L)
-
     val modelItems = kmeansItems.fit(datasetItems)
 
-    // Evaluate clustering by computing Within Set Sum of Squared Errors.
-    val WSSSEItems = modelItems.computeCost(datasetItems)
-    println(s"Items :  Within Set Sum of Squared Errors = $WSSSEItems")
-
-    // Shows the result.
-    println("Items - Cluster Centers: ")
-    modelItems.clusterCenters.foreach(println)
 
     val predictedDataSetItems = modelItems.transform(datasetItems)
     val predictionsItems = predictedDataSetItems.select("prediction").rdd.map(x=> x(0))

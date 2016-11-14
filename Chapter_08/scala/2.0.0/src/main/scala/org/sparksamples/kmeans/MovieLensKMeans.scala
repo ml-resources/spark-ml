@@ -27,6 +27,7 @@ import org.sparksamples.als.ALSMovieLens.Rating
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
+import org.sparksamples.Util
 
 
 /**
@@ -48,9 +49,6 @@ object MovieLensKMeans {
       .getOrCreate()
     import spark.implicits._
 
-
-    // Shows the re
-
     val datasetUsers = spark.read.format("libsvm").load(
       "./data/movie_lens_libsvm/movie_lens_users_libsvm/part-00000")
     datasetUsers.show(3)
@@ -63,11 +61,18 @@ object MovieLensKMeans {
     val predictedUserClusters = modelUsers.transform(datasetUsers)
     predictedUserClusters.show(5)
 
-    val movieDF = getMovieDataDF(spark)
+    val movieDF = Util.getMovieDataDF(spark)
 
     val joinedMovieDFAndPredictedCluster = movieDF.join(predictedUserClusters,predictedUserClusters("label") === movieDF("id"))
     print(joinedMovieDFAndPredictedCluster.first())
     joinedMovieDFAndPredictedCluster.show(5)
+
+    for(i <- 0 until 5) {
+      val prediction0 = joinedMovieDFAndPredictedCluster.filter("prediction == " + i)
+      println("Cluster : " + i)
+      println("--------------------------")
+      prediction0.select("name").show(10)
+    }
 
     // Evaluate clustering by computing Within Set Sum of Squared Errors.
     val WSSSEUsers = modelUsers.computeCost(datasetUsers)
@@ -77,9 +82,9 @@ object MovieLensKMeans {
     modelUsers.clusterCenters.foreach(println)
 
     val datasetItems = spark.read.format("libsvm").load(
-      "./data/movie_lens_libsvm/movie_lens_users_libsvm/part-00000")
+      "./data/movie_lens_libsvm/movie_lens_items_libsvm/part-00000")
     datasetItems.show(3)
-    
+
 
     val kmeansItems = new KMeans().setK(5).setSeed(1L)
 
@@ -97,20 +102,7 @@ object MovieLensKMeans {
   }
   import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 
-  def getMovieDataDF(spark : SparkSession) : DataFrame = {
 
-    //1|Toy Story (1995)|01-Jan-1995||http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)
-    // |0|0|0|1|1|1|0|0|0|0|0|0|0|0|0|0|0|0|0
-    val customSchema = StructType(Array(
-      StructField("id", StringType, true),
-      StructField("name", StringType, true),
-      StructField("date", StringType, true),
-      StructField("url", StringType, true)));
-    val movieDf = spark.read.format("com.databricks.spark.csv")
-      .option("delimiter", "|").schema(customSchema)
-      .load(PATH_MOVIES)
-    return movieDf
-  }
 
 
   def loadInLibSVMFormat(line: String, noOfFeatures : Int) : LabeledPoint = {

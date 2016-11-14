@@ -8,6 +8,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.ml.clustering.BisectingKMeans
 
 import org.apache.spark.sql.SparkSession
+import org.sparksamples.Util
 
 /**
   *
@@ -32,15 +33,30 @@ object BisectingKMeans {
     datasetUsers.show(3)
     val bKMeansUsers = new BisectingKMeans()
     bKMeansUsers.setMaxIter(10)
-    bKMeansUsers.setMinDivisibleClusterSize(5)
+    bKMeansUsers.setMinDivisibleClusterSize(4)
 
     val modelUsers = bKMeansUsers.fit(datasetUsers)
+
+    val movieDF = Util.getMovieDataDF(spark)
+    val predictedUserClusters = modelUsers.transform(datasetUsers)
+    predictedUserClusters.show(5)
+
+    val joinedMovieDFAndPredictedCluster =
+      movieDF.join(predictedUserClusters,predictedUserClusters("label") === movieDF("id"))
+    print(joinedMovieDFAndPredictedCluster.first())
+    joinedMovieDFAndPredictedCluster.show(5)
+
+    for(i <- 0 until 5) {
+      val prediction0 = joinedMovieDFAndPredictedCluster.filter("prediction == " + i)
+      println("Cluster : " + i)
+      println("--------------------------")
+      prediction0.select("name").show(10)
+    }
 
     // Evaluate clustering by computing Within Set Sum of Squared Errors.
     val WSSSEUsers = modelUsers.computeCost(datasetUsers)
     println(s"Users :  Within Set Sum of Squared Errors = $WSSSEUsers")
 
-    // Shows the result.
     println("Users : Cluster Centers: ")
     modelUsers.clusterCenters.foreach(println)
 
@@ -49,7 +65,6 @@ object BisectingKMeans {
     datasetItems.show(3)
 
     val kmeansItems = new BisectingKMeans().setK(5).setSeed(1L)
-
     val modelItems = kmeansItems.fit(datasetItems)
 
     // Evaluate clustering by computing Within Set Sum of Squared Errors.

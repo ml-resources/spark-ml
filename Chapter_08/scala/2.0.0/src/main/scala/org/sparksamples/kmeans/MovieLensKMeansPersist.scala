@@ -61,6 +61,7 @@ object MovieLensKMeansPersist {
     datasetUsers.show(3)
 
     val kmeans = new KMeans().setK(5).setSeed(1L)
+    kmeans.setMaxIter(20)
     val modelUsers = kmeans.fit(datasetUsers)
 
     // Evaluate clustering by computing Within Set Sum of Squared Errors.
@@ -69,7 +70,7 @@ object MovieLensKMeansPersist {
     print(predictedDataSetUsers.first())
     print(predictedDataSetUsers.count())
     val predictionsUsers = predictedDataSetUsers.select("prediction").rdd.map(x=> x(0))
-    predictionsUsers.saveAsTextFile(BASE + "/prediction/" + date_time + "/users")
+    predictionsUsers.saveAsTextFile(BASE + "/prediction/" + date_time + "/kmeans-users")
 
     //val datasetItems = spark.read.format("libsvm").load(
     //  BASE + "/movie_lens_items_libsvm/part-00000")
@@ -88,7 +89,7 @@ object MovieLensKMeansPersist {
     modelUsers.clusterCenters.foreach(println)
     val predictedDataSetItems = modelItems.transform(datasetItems)
     val predictionsItems = predictedDataSetItems.select("prediction").rdd.map(x=> x(0))
-    predictionsItems.saveAsTextFile(BASE + "/prediction/" + date_time + "/items")
+    predictionsItems.saveAsTextFile(BASE + "/prediction/" + date_time + "/kmeans-items")
 
     spark.stop()
   }

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageFilter
 import os
 
-PATH = "../../../data"
+PATH = "../../../../data"
 
 
 def main():
@@ -15,11 +15,11 @@ def main():
     im = Image.open(path)
     im.show()
 
-    tmp_path = "/tmp/aeGray.jpg"
+    tmp_path = PATH + "/aeGray.jpg"
     ae_gary = Image.open(tmp_path)
     ae_gary.show()
 
-    pc = np.loadtxt("/tmp/pc.csv", delimiter=",")
+    pc = np.loadtxt(PATH + "/pc.csv", delimiter=",")
     print(pc.shape)
     # (2500, 10)
 

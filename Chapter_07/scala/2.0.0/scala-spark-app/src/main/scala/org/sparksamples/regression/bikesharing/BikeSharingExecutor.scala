@@ -49,26 +49,26 @@ object BikeSharingExecutor {
     val vectorIndexer = new VectorIndexer().setInputCol("rawFeatures").setOutputCol("features").setMaxCategories(2)
 
     // set as an argument
-    val command = "GBT_withoutCatg"
+    val command = "GBT_SVM"
 
     executeCommand(command, vectorAssembler, vectorIndexer, df2, spark)
   }
 
   def executeCommand(arg: String, vectorAssembler: VectorAssembler, vectorIndexer: VectorIndexer, dataFrame: DataFrame, spark: SparkSession) = arg match {
-    case "LR__withCatg" => LinearRegressionPipeline.linearRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
-    case "LR__withoutCatg" => LinearRegressionPipeline.linearRegressionWithSVMFormat(spark)
+    case "LR_Vectors" => LinearRegressionPipeline.linearRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "LR_SVM" => LinearRegressionPipeline.linearRegressionWithSVMFormat(spark)
 
-    case "GLR_withCatg" => GeneralizedLinearRegressionPipeline.genLinearRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
-    case "GLR_withoutCatg"=> GeneralizedLinearRegressionPipeline.genLinearRegressionWithSVMFormat(spark)
+    case "GLR_Vectors" => GeneralizedLinearRegressionPipeline.genLinearRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "GLR_SVM"=> GeneralizedLinearRegressionPipeline.genLinearRegressionWithSVMFormat(spark)
 
-    case "DT_withCatg" => DecisionTreeRegressionPipeline.decTreeRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
-    case "DT_withoutCatg"=> GeneralizedLinearRegressionPipeline.genLinearRegressionWithSVMFormat(spark)
+    case "DT_Vectors" => DecisionTreeRegressionPipeline.decTreeRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "DT_SVM"=> GeneralizedLinearRegressionPipeline.genLinearRegressionWithSVMFormat(spark)
 
-    case "RF_withCatg" => RandomForestRegressionPipeline.randForestRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
-    case "RF_withoutCatg"=> RandomForestRegressionPipeline.randForestRegressionWithSVMFormat(spark)
+    case "RF_Vectors" => RandomForestRegressionPipeline.randForestRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "RF_SVM"=> RandomForestRegressionPipeline.randForestRegressionWithSVMFormat(spark)
 
-    case "GBT_withCatg" => GradientBoostedTreeRegressorPipeline.gbtRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
-    case "GBT_withoutCatg"=> GradientBoostedTreeRegressorPipeline.gbtRegressionWithSVMFormat(spark)
+    case "GBT_Vectors" => GradientBoostedTreeRegressorPipeline.gbtRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "GBT_SVM"=> GradientBoostedTreeRegressorPipeline.gbtRegressionWithSVMFormat(spark)
 
   }
 

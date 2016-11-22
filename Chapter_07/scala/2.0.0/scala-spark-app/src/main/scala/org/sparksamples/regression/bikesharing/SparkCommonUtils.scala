@@ -1,4 +1,4 @@
-package org.sparksamples.classification.stumbleupon
+package org.sparksamples.regression.bikesharing
 
 import org.apache.spark.SparkConf
 

@@ -1,18 +1,10 @@
-package org.sparksamples.classification.stumbleupon
+package org.sparksamples.regression.bikesharing
 
 import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
-import org.apache.spark.ml.evaluation.RegressionEvaluator
-import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.ml.{Pipeline, PipelineStage}
-import org.apache.spark.ml.feature.{OneHotEncoder, StringIndexer, VectorAssembler, VectorIndexer}
-import org.apache.spark.ml.regression.LinearRegression
-import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
-import org.apache.spark.mllib.evaluation.RegressionMetrics
-import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionModel}
-import org.apache.spark.sql.functions._
+import org.apache.spark.ml.feature.{VectorAssembler, VectorIndexer}
 import org.apache.spark.sql.types.DataType
-import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 
 /**
@@ -22,19 +14,20 @@ object BikeSharingExecutor {
   @transient lazy val logger = Logger.getLogger(getClass.getName)
 
   def main(args: Array[String]) {
-    val conf = SparkCommonUtils.createSparkConf("BikeSharing")
-    val sc = new SparkContext(conf)
+    val spark = SparkSession
+      .builder
+      .appName("BikeSharing")
+      .master("local[1]")
+      .getOrCreate()
 
-    // create sql context
-    val sqlContext = new SQLContext(sc)
-
-    val df = sqlContext.read.format("csv").option("header", "true").load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_07/scala/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/regression/dataset/BikeSharing/hour.csv")
+    // read from csv
+    val df = spark.read.format("csv").option("header", "true").load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_07/scala/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/regression/dataset/BikeSharing/hour.csv")
     df.cache()
 
     df.registerTempTable("BikeSharing")
     print(df.count())
 
-    sqlContext.sql("SELECT * FROM BikeSharing").show()
+    spark.sql("SELECT * FROM BikeSharing").show()
 
     // drop record id, date, casual and registered columns
     val df1 = df.drop("instant").drop("dteday").drop("casual").drop("registered")
@@ -48,31 +41,37 @@ object BikeSharingExecutor {
 
     df2.printSchema()
 
+    // drop label and create feature vector
     val df3 = df2.drop("label")
     val featureCols = df3.columns
 
-    val vectorAssembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
-    val vectorIndexer = new VectorIndexer().setInputCol("rawFeatures").setOutputCol("features").setMaxCategories(4)
+    val vectorAssembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("rawFeatures")
+    val vectorIndexer = new VectorIndexer().setInputCol("rawFeatures").setOutputCol("features").setMaxCategories(2)
 
-    val command = args(0)
+    // set as an argument
+    val command = "GBT_withoutCatg"
 
-    executeCommand(command, vectorAssembler, df2, sc)
+    executeCommand(command, vectorAssembler, vectorIndexer, df2, spark)
   }
 
-  def executeCommand(arg: String, vectorAssembler: VectorAssembler, dataFrame: DataFrame, sparkContext: SparkContext) = arg match {
-    case "LR" => LinearRegressionPipeline.linearRegressionPipeline(vectorAssembler, dataFrame)
+  def executeCommand(arg: String, vectorAssembler: VectorAssembler, vectorIndexer: VectorIndexer, dataFrame: DataFrame, spark: SparkSession) = arg match {
+    case "LR__withCatg" => LinearRegressionPipeline.linearRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "LR__withoutCatg" => LinearRegressionPipeline.linearRegressionWithSVMFormat(spark)
 
-    case "DT" => DecisionTreePipeline.decisionTreePipeline(vectorAssembler, dataFrame)
+    case "GLR_withCatg" => GeneralizedLinearRegressionPipeline.genLinearRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "GLR_withoutCatg"=> GeneralizedLinearRegressionPipeline.genLinearRegressionWithSVMFormat(spark)
 
-    case "RF" => RandomForestPipeline.randomForestPipeline(vectorAssembler, dataFrame)
+    case "DT_withCatg" => DecisionTreeRegressionPipeline.decTreeRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "DT_withoutCatg"=> GeneralizedLinearRegressionPipeline.genLinearRegressionWithSVMFormat(spark)
 
-    case "GBT" => GradientBoostedTreePipeline.gradientBoostedTreePipeline(vectorAssembler, dataFrame)
+    case "RF_withCatg" => RandomForestRegressionPipeline.randForestRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "RF_withoutCatg"=> RandomForestRegressionPipeline.randForestRegressionWithSVMFormat(spark)
 
-    case "NB" => NaiveBayesPipeline.naiveBayesPipeline(vectorAssembler, dataFrame)
+    case "GBT_withCatg" => GradientBoostedTreeRegressorPipeline.gbtRegressionWithVectorFormat(vectorAssembler, vectorIndexer, dataFrame)
+    case "GBT_withoutCatg"=> GradientBoostedTreeRegressorPipeline.gbtRegressionWithSVMFormat(spark)
 
-    case "SVM" => SVMPipeline.svmPipeline(sparkContext)
   }
-  
+
   object DFHelper
   def castColumnTo( df: DataFrame, cn: String, tpe: DataType ) : DataFrame = {
     df.withColumn( cn, df(cn).cast(tpe) )

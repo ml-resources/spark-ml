@@ -1,14 +1,12 @@
-package org.sparksamples.classification.stumbleupon
+package org.sparksamples.regression.bikesharing
 
 import org.apache.log4j.Logger
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.classification.LogisticRegression
-import org.apache.spark.ml.evaluation.RegressionEvaluator
-import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.feature.{VectorAssembler, VectorIndexer}
 import org.apache.spark.ml.regression.LinearRegression
-import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
+import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
 import org.apache.spark.mllib.evaluation.RegressionMetrics
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
   * Created by manpreet.singh on 01/05/16.
@@ -16,44 +14,49 @@ import org.apache.spark.sql.DataFrame
 object LinearRegressionPipeline {
   @transient lazy val logger = Logger.getLogger(getClass.getName)
 
-  def linearRegressionPipeline(vectorAssembler: VectorAssembler, dataFrame: DataFrame) = {
+  def linearRegressionWithVectorFormat(vectorAssembler: VectorAssembler, vectorIndexer: VectorIndexer, dataFrame: DataFrame) = {
     val lr = new LinearRegression()
+      .setFeaturesCol("features")
+      .setLabelCol("label")
+      .setRegParam(0.1)
+      .setElasticNetParam(1.0)
+      .setMaxIter(10)
 
-    val paramGrid = new ParamGridBuilder()
-      .addGrid(lr.regParam, Array(0.1, 0.01))
-      .addGrid(lr.fitIntercept)
-      .addGrid(lr.elasticNetParam, Array(0.0, 0.25, 0.5, 0.75, 1.0))
-      .build()
-
-    val pipeline = new Pipeline().setStages(Array(vectorAssembler, lr))
-
-    val trainValidationSplit = new TrainValidationSplit()
-      .setEstimator(pipeline)
-      .setEvaluator(new RegressionEvaluator)
-      .setEstimatorParamMaps(paramGrid)
-      // 80% of the data will be used for training and the remaining 20% for validation.
-      .setTrainRatio(0.8)
+    val pipeline = new Pipeline().setStages(Array(vectorAssembler, vectorIndexer, lr))
 
     val Array(training, test) = dataFrame.randomSplit(Array(0.8, 0.2), seed = 12345)
 
-    val model = trainValidationSplit.fit(training)
-    val holdout = model.transform(test).select("prediction","label")
+    val model = pipeline.fit(training)
 
-    val rm = new RegressionMetrics(holdout.rdd.map(x => (x(0).asInstanceOf[Double], x(1).asInstanceOf[Double])))
+    val fullPredictions = model.transform(test).cache()
+    val predictions = fullPredictions.select("prediction").rdd.map(_.getDouble(0))
+    val labels = fullPredictions.select("label").rdd.map(_.getDouble(0))
+    val RMSE = new RegressionMetrics(predictions.zip(labels)).rootMeanSquaredError
+    println(s"  Root mean squared error (RMSE): $RMSE")
+  }
 
-    logger.info("Test Metrics")
-    logger.info("Test Explained Variance:")
-    logger.info(rm.explainedVariance)
-    logger.info("Test R^2 Coef:")
-    logger.info(rm.r2)
-    logger.info("Test MSE:")
-    logger.info(rm.meanSquaredError)
-    logger.info("Test RMSE:")
-    logger.info(rm.rootMeanSquaredError)
+  def linearRegressionWithSVMFormat(spark: SparkSession) = {
+    // Load training data
+    val training = spark.read.format("libsvm")
+      .load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_07/scala/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/regression/dataset/BikeSharing/lsvmHours.txt")
 
-    val totalPoints = training.count()
-    val lrTotalCorrect = holdout.rdd.map(x => if (x(0).asInstanceOf[Double] == x(1).asInstanceOf[Double]) 1 else 0).sum()
-    val accuracy = lrTotalCorrect/totalPoints
-    println("Accuracy of LinearRegression is: ", accuracy)
+    val lr = new LinearRegression()
+      .setMaxIter(10)
+      .setRegParam(0.3)
+      .setElasticNetParam(0.8)
+
+    // Fit the model
+    val lrModel = lr.fit(training)
+
+    // Print the coefficients and intercept for linear regression
+    println(s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
+
+    // Summarize the model over the training set and print out some metrics
+    val trainingSummary = lrModel.summary
+    println(s"numIterations: ${trainingSummary.totalIterations}")
+    println(s"objectiveHistory: ${trainingSummary.objectiveHistory.toList}")
+    trainingSummary.residuals.show()
+    println(s"RMSE: ${trainingSummary.rootMeanSquaredError}")
+    println(s"r2: ${trainingSummary.r2}")
   }
 }

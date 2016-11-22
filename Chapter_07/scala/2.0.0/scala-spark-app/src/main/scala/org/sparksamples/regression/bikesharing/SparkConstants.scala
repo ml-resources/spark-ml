@@ -1,4 +1,4 @@
-package org.sparksamples.classification.stumbleupon
+package org.sparksamples.regression.bikesharing
 
 /**
   * Created by manpreet.singh on 26/04/16.

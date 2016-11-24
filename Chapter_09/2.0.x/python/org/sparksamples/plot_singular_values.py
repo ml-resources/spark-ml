@@ -6,7 +6,7 @@ PATH = "../../../data"
 
 
 def main():
-    file_name = '/home/ubuntu/work/ml-resources/spark-ml/Chapter_09/scala/s.csv'
+    file_name = '/home/ubuntu/work/ml-resources/spark-ml/Chapter_09/data/s.csv'
     data = np.genfromtxt(file_name, delimiter=',')
 
     plt.plot(data)

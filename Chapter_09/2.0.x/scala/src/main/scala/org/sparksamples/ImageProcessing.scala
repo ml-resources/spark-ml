@@ -10,7 +10,8 @@ import org.apache.spark.{SparkConf, SparkContext}
   * @author Rajdeep Dua
   */
 object ImageProcessing {
-  val PATH= "../data"
+  val PATH= "../../data"
+
   def main(args: Array[String]): Unit = {
     val spConfig = (new SparkConf).setMaster("local[1]").setAppName("SparkApp").
       set("spark.driver.allowMultipleContexts", "true")
@@ -18,10 +19,8 @@ object ImageProcessing {
     val path = PATH +  "/lfw/*"
     val rdd = sc.wholeTextFiles(path)
     val first = rdd.first
-    //println(first)
     val files = rdd.map { case (fileName, content) => fileName.replace("file:", "") }
-    //println(files.first)
-    // file:/PATH/lfw/Aaron_Eckhart/Aaron_Eckhart_0001.jpg
+
     println(files.count)
 
     val aePath = PATH + "/lfw/Aaron_Eckhart/Aaron_Eckhart_0001.jpg"
@@ -50,7 +49,7 @@ object ImageProcessing {
     val cols = pc.numCols
     val pcBreeze = new DenseMatrix(rows, cols, pc.toArray)
     println(rows, cols)
-    //csvwrite(new File("/tmp/pc.csv"), pcBreeze)
+    csvwrite(new File(PATH + "/pc.csv"), pcBreeze)
     val projected = matrix.multiply(pc)
     println(projected.numRows, projected.numCols)
     // (1055,10)
@@ -88,7 +87,7 @@ object ImageProcessing {
     val svd300 = matrix.computeSVD(300, computeU = false)
     val sMatrix = new DenseMatrix(1, 300, svd300.s.toArray)
     println(sMatrix)
-    csvwrite(new File("/home/ubuntu/work/ml-resources/spark-ml/Chapter_09/scala/s.csv"), sMatrix)
+    csvwrite(new File(PATH + "/s.csv"), sMatrix)
 
   }
   def approxEqual(array1: Array[Double], array2: Array[Double], tolerance: Double = 1e-6): Boolean = {

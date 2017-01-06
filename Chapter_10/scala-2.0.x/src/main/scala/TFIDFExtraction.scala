@@ -20,8 +20,6 @@ object TFIDFExtraction {
     println(rdd.count)
     /*
     ...
-    14/10/12 14:27:54 INFO FileInputFormat: Total input paths to process : 11314
-    ...
     11314
     */
     println(rdd.first())
@@ -61,39 +59,14 @@ object TFIDFExtraction {
     println(nonWordSplit.distinct.count)
     // 130126
     // inspect a look at a sample of tokens
-    println(nonWordSplit.distinct.sample(true, 0.3, 42).take(100).mkString(","))
-    /*
-      atheist,resources
-      summary:,addresses,,to,atheism
-      keywords:,music,,thu,,11:57:19,11:57:19,gmt
-      distribution:,cambridge.,290
-
-      archive-name:,atheism/resources
-      alt-atheism-archive-name:,december,,,,,,,,,,,,,,,,,,,,,,addresses,addresses,,,,,,,religion,to:,to:,,p.o.,53701.
-      telephone:,sell,the,,fish,on,their,cars,,with,and,written
-      inside.,3d,plastic,plastic,,evolution,evolution,7119,,,,,san,san,san,mailing,net,who,to,atheist,press
-
-      aap,various,bible,,and,on.,,,one,book,is:
-
-      "the,w.p.,ameri
-      can,pp.,,1986.,bible,contains,ball,,based,based,james,of
-      */
-      /*
-  bone,k29p,w1w3s1,odwyer,dnj33n,bruns,_congressional,mmejv5,mmejv5,artur,125215,entitlements,beleive,1pqd9hinnbmi,
-  jxicaijp,b0vp,underscored,believiing,qsins,1472,urtfi,nauseam,tohc4,kielbasa,ao,wargame,seetex,museum,typeset,pgva4,
-  dcbq,ja_jp,ww4ewa4g,animating,animating,10011100b,10011100b,413,wp3d,wp3d,cannibal,searflame,ets,1qjfnv,6jx,6jx,
-  detergent,yan,aanp,unaskable,9mf,bowdoin,chov,16mb,createwindow,kjznkh,df,classifieds,hour,cfsmo,santiago,santiago,
-  1r1d62,almanac_,almanac_,chq,nowadays,formac,formac,bacteriophage,barking,barking,barking,ipmgocj7b,monger,projector,
-  hama,65e90h8y,homewriter,cl5,1496,zysec,homerific,00ecgillespie,00ecgillespie,mqh0,suspects,steve_mullins,io21087,
-  funded,liberated,canonical,throng,0hnz,exxon,xtappcontext,mcdcup,mcdcup,5seg,biscuits
-  */
+    println(nonWordSplit.distinct.sample(true, 0.3, 50).take(100).mkString(","))
 
     // filter out numbers
 
     val filterNumbers = nonWordSplit.filter(token => regex.pattern.matcher(token).matches)
     println(filterNumbers.distinct.count)
     // 84912
-    println(filterNumbers.distinct.sample(true, 0.3, 42).take(100).mkString(","))
+    println(filterNumbers.distinct.sample(true, 0.3, 50).take(100).mkString(","))
     /*
     reunion,wuair,schwabam,eer,silikian,fuller,sloppiness,crying,crying,beckmans,leymarie,fowl,husky,rlhzrlhz,ignore,
     loyalists,goofed,arius,isgal,dfuller,neurologists,robin,jxicaijp,majorly,nondiscriminatory,akl,sively,adultery,
@@ -317,6 +290,27 @@ object TFIDFExtraction {
     val breeze2 = new SparseVector(hockey2.indices, hockey2.values, hockey2.size)
     val cosineSim = breeze1.dot(breeze2) / (norm(breeze1) * norm(breeze2))
     println(cosineSim)
+
+    // 0.06700095047242809
+
+    val graphicsText = rdd.filter { case (file, text) => file.contains("comp.graphics") }
+    val graphicsTF = graphicsText.mapValues(doc => hashingTF.transform(tokenize(doc)))
+    val graphicsTfIdf = idf.transform(graphicsTF.map(_._2))
+    val graphics = graphicsTfIdf.sample(true, 0.1, 42).first.asInstanceOf[SV]
+    val breezeGraphics = new SparseVector(graphics.indices, graphics.values, graphics.size)
+    val cosineSim2 = breeze1.dot(breezeGraphics) / (norm(breeze1) * norm(breezeGraphics))
+    println(cosineSim2)
+    // 0.001950124251275256
+
+    // compare to sport.baseball topic
+    val baseballText = rdd.filter { case (file, text) => file.contains("baseball") }
+    val baseballTF = baseballText.mapValues(doc => hashingTF.transform(tokenize(doc)))
+    val baseballTfIdf = idf.transform(baseballTF.map(_._2))
+    val baseball = baseballTfIdf.sample(true, 0.1, 42).first.asInstanceOf[SV]
+    val breezeBaseball = new SparseVector(baseball.indices, baseball.values, baseball.size)
+    val cosineSim3 = breeze1.dot(breezeBaseball) / (norm(breeze1) * norm(breezeBaseball))
+    println(cosineSim3)
+    // 0.0013298577308832765
 
     sc.stop()
   }

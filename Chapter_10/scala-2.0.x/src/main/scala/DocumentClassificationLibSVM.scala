@@ -19,9 +19,9 @@ object DocumentClassificationLibSVM {
       .appName("SparkRatingData").config(spConfig)
       .getOrCreate()
 
-    val trainingData = spark.read.format("libsvm").load("./output/20news-by-date-train-libsvm/part-combined")
-    val testData = spark.read.format("libsvm").load("./output/20news-by-date-test-libsvm/part-combined")
+    val data = spark.read.format("libsvm").load("./output/20news-by-date-train-libsvm/part-combined")
 
+    val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3), seed = 1L)
 
     // Train a NaiveBayes model.
     val model = new NaiveBayes()

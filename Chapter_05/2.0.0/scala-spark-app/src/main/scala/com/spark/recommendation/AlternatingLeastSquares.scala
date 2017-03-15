@@ -104,7 +104,6 @@ object AlternatingLeastSquares {
       println("RMSE = " + rmse(r_space, ms, us))
       println()
     }
-
     spark.stop()
   }
 }

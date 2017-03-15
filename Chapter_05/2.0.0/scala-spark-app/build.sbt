@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
 
 // https://mvnrepository.com/artifact/org.jblas/jblas
 libraryDependencies += "org.jblas" % "jblas" % "1.2.4"
+libraryDependencies += "com.github.scopt" % "scopt_2.10" % "3.2.0"
 
 
 resolvers ++= Seq(

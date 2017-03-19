@@ -67,21 +67,33 @@ object AlternatingLeastSquares {
       XtX.addToEntry(d, d, LAMBDA * U)
     }
     // Solve it with Cholesky
-    new CholeskyDecomposition(XtX).getSolver.solve(Xty)
+      new CholeskyDecomposition(XtX).getSolver.solve(Xty)
   }
 
   def main(args: Array[String]) {
 
+    //initialize variables for rand data generation
     movies = 100
     users = 500
     features = 10
     ITERATIONS = 5
     var slices = 2
 
+    //initiate Spack Context
+
     val spark = SparkSession.builder.master("local[2]").appName("AlternatingLeastSquares").getOrCreate()
     val sc = spark.sparkContext
 
+    // create a Realmatrix with the follow
+    // movies matrix : 100 x 10
+    // feature matrix : 500 x 10
+    // populate with random numbers
+    // multiple movie matrix with transpose of user matric
+    // (100 x 10 ) x ( 10 x 500) = 100 x 500 matrix
+
     val r_space = rSpace()
+    println("No of rows:" + r_space.getRowDimension)
+    println("No of cols:" + r_space.getColumnDimension)
 
     // Initialize m and u randomly
     var ms = Array.fill(movies)(vector(features))
@@ -91,6 +103,9 @@ object AlternatingLeastSquares {
     val Rc = sc.broadcast(r_space)
     var msb = sc.broadcast(ms)
     var usb = sc.broadcast(us)
+    //Objective is to find ms and us matrices by iterating over existing values and comparing with the real value matrix
+    //Choksey decomposition is being used to solve this
+
     for (iter <- 1 to ITERATIONS) {
       println(s"Iteration $iter:")
       ms = sc.parallelize(0 until movies, slices)

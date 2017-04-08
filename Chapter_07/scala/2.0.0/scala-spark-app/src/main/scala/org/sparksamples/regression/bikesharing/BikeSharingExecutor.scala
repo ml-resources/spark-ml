@@ -1,7 +1,6 @@
 package org.sparksamples.regression.bikesharing
 
 import org.apache.log4j.Logger
-import org.apache.spark.SparkContext
 import org.apache.spark.ml.feature.{VectorAssembler, VectorIndexer}
 import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -20,8 +19,10 @@ object BikeSharingExecutor {
       .master("local[1]")
       .getOrCreate()
 
+    println(System.getProperty("user.dir"))
+
     // read from csv
-    val df = spark.read.format("csv").option("header", "true").load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_07/scala/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/regression/dataset/BikeSharing/hour.csv")
+    val df = spark.read.format("csv").option("header", "true").load("./src/main/scala/org/sparksamples/regression/dataset/BikeSharing/hour.csv")
     df.cache()
 
     df.registerTempTable("BikeSharing")
@@ -46,10 +47,11 @@ object BikeSharingExecutor {
     val featureCols = df3.columns
 
     val vectorAssembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("rawFeatures")
+
     val vectorIndexer = new VectorIndexer().setInputCol("rawFeatures").setOutputCol("features").setMaxCategories(2)
 
     // set as an argument
-    val command = "GBT_SVM"
+    val command = "GLR_SVM"
 
     executeCommand(command, vectorAssembler, vectorIndexer, df2, spark)
   }

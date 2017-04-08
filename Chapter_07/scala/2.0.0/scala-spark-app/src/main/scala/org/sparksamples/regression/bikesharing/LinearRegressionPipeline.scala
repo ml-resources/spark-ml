@@ -4,7 +4,6 @@ import org.apache.log4j.Logger
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.feature.{VectorAssembler, VectorIndexer}
 import org.apache.spark.ml.regression.LinearRegression
-import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
 import org.apache.spark.mllib.evaluation.RegressionMetrics
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -38,7 +37,7 @@ object LinearRegressionPipeline {
   def linearRegressionWithSVMFormat(spark: SparkSession) = {
     // Load training data
     val training = spark.read.format("libsvm")
-      .load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_07/scala/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/regression/dataset/BikeSharing/lsvmHours.txt")
+      .load("./src/main/scala/org/sparksamples/regression/dataset/BikeSharing/lsvmHours.txt")
 
     val lr = new LinearRegression()
       .setMaxIter(10)
@@ -57,6 +56,7 @@ object LinearRegressionPipeline {
     println(s"objectiveHistory: ${trainingSummary.objectiveHistory.toList}")
     trainingSummary.residuals.show()
     println(s"RMSE: ${trainingSummary.rootMeanSquaredError}")
+
     println(s"r2: ${trainingSummary.r2}")
   }
 }

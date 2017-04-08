@@ -1,8 +1,6 @@
 package org.sparksamples.regression.bikesharing
 
-import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
-import org.sparksamples.classification.stumbleupon.SparkCommonUtils
 
 /**
   * Created by manpreet.singh on 14/11/16.
@@ -19,7 +17,6 @@ object OneHotEncoderExample {
       .getOrCreate()
 
     // For implicit conversions like converting RDDs to DataFrames
-    import spark.implicits._
     val df = spark.createDataFrame(Seq(
       (0, 3),
       (1, 2),

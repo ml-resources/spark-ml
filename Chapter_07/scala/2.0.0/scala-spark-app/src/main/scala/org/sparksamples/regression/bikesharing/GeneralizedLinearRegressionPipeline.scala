@@ -3,7 +3,7 @@ package org.sparksamples.regression.bikesharing
 import org.apache.log4j.Logger
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.feature.{VectorAssembler, VectorIndexer}
-import org.apache.spark.ml.regression.{GeneralizedLinearRegression, LinearRegression}
+import org.apache.spark.ml.regression.GeneralizedLinearRegression
 import org.apache.spark.mllib.evaluation.RegressionMetrics
 import org.apache.spark.sql.{SparkSession, _}
 
@@ -39,7 +39,7 @@ object GeneralizedLinearRegressionPipeline {
   def genLinearRegressionWithSVMFormat(spark: SparkSession) = {
     // Load training data
     val training = spark.read.format("libsvm")
-      .load("/Users/manpreet.singh/Sandbox/codehub/github/machinelearning/spark-ml/Chapter_07/scala/2.0.0/scala-spark-app/src/main/scala/org/sparksamples/regression/dataset/BikeSharing/lsvmHours.txt")
+      .load("./src/main/scala/org/sparksamples/regression/dataset/BikeSharing/lsvmHours.txt")
 
     val lr = new GeneralizedLinearRegression()
       .setFamily("gaussian")

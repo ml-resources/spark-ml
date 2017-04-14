@@ -9,16 +9,21 @@ object Word2VecMl {
     val spConfig = (new SparkConf).setMaster("local").setAppName("SparkApp")
     val spark = SparkSession
       .builder
-      .appName("Word2Vec example").config(spConfig)
+      .appName("Word2Vec Sample").config(spConfig)
       .getOrCreate()
 
     import spark.implicits._
 
     val rawDF = spark.sparkContext
-      .wholeTextFiles("../data/20news-bydate-train/*")
+      .wholeTextFiles("./data/20news-bydate-train/alt.atheism/*")
 
-    val textDF = rawDF.map(x => x._2.split(" ")).map(Tuple1.apply)
+    val temp = rawDF.map( x => {
+      (x._2.filter(_ >= ' ').filter(! _.toString.startsWith("(")) )
+    })
+
+    val textDF = temp.map(x => x.split(" ")).map(Tuple1.apply)
       .toDF("text")
+    print(textDF.first())
     val word2Vec = new Word2Vec()
       .setInputCol("text")
       .setOutputCol("result")
@@ -27,8 +32,8 @@ object Word2VecMl {
     val model = word2Vec.fit(textDF)
     val result = model.transform(textDF)
     result.select("result").take(3).foreach(println)
-    val ds = model.findSynonyms("hockey", 20).select("word")
-    ds.rdd.saveAsTextFile("./output/hockey-synonyms")
+    val ds = model.findSynonyms("philosophers", 5).select("word")
+    ds.rdd.saveAsTextFile("./output/alien-synonyms" +  System.nanoTime())
     ds.show()
     spark.stop()
   }

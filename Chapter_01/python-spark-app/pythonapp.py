@@ -1,10 +1,16 @@
 """A simple Spark app in Python"""
 import os
 import sys
+os.environ['SPARK_HOME']="/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
+SPARK_HOME = os.environ['SPARK_HOME']
+
+# Add the PySpark/py4j to the Python Path
+sys.path.insert(0, os.path.join(SPARK_HOME, "python", "lib"))
+sys.path.insert(0, os.path.join(SPARK_HOME, "python"))
 from pyspark import SparkContext
 from pyspark import SparkConf
 
-os.environ['SPARK_HOME']="/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
+
 
 # Append pyspark  to Python Path
 sys.path.append("/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7")

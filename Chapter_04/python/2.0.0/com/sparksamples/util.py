@@ -1,12 +1,13 @@
 import os
 import sys
-from pyspark.sql.types import *
+
 PATH = "/home/ubuntu/work/ml-resources/spark-ml/data"
 SPARK_HOME = "/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
 
 os.environ['SPARK_HOME'] = SPARK_HOME
 sys.path.append(SPARK_HOME + "/python")
 
+from pyspark.sql.types import *
 from pyspark import SparkContext
 from pyspark import SparkConf
 from pyspark.sql import SparkSession

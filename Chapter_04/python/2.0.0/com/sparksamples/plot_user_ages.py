@@ -9,7 +9,7 @@ def main():
     user_ages = user_data.select('age').collect()
     user_ages_list = []
     user_ages_len = len(user_ages)
-    for i in range(0, (user_ages_len - 1)):
+    for i in range(user_ages_len):
         user_ages_list.append(user_ages[i].age)
     plt.hist(user_ages_list, bins=20, color='lightblue', normed=True)
     fig = matplotlib.pyplot.gcf()

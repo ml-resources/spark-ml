@@ -1,8 +1,8 @@
 import os
 import sys
 
-PATH = "/home/ubuntu/work/ml-resources/spark-ml/data"
-SPARK_HOME = "/home/ubuntu/work/spark-2.0.0-bin-hadoop2.7/"
+PATH = "/Users/zouxuan/Documents/spark"
+SPARK_HOME = "/Users/zouxuan/Documents/spark/spark-2.1.1-bin-hadoop2.7"
 
 os.environ['SPARK_HOME'] = SPARK_HOME
 sys.path.append(SPARK_HOME + "/python")
@@ -26,7 +26,7 @@ def get_user_data():
         StructField("zipCode", StringType(), True)
     ])
     from pyspark.sql import SQLContext
-    from pyspark.sql.types import *
+    # from pyspark.sql.types import *
 
     sql_context = SQLContext(sc)
 
@@ -54,7 +54,7 @@ def get_movie_data_df():
         StructField("f18", IntegerType(), True), StructField("f19", IntegerType(), True)
     ])
     from pyspark.sql import SQLContext
-    from pyspark.sql.types import *
+    # from pyspark.sql.types import *
 
     sql_context = SQLContext(sc)
 

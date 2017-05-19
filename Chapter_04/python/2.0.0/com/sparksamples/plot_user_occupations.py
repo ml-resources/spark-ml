@@ -8,10 +8,11 @@ def main():
     user_data = get_user_data()
     user_occ = user_data.groupby("occupation").count().collect()
 
-    user_occ_len = len(user_occ)
+
     user_occ_list = []
-    for i in range(0, (user_occ_len - 1)):
+    for i in range(len(user_occ)):
         element = user_occ[i]
+        print element
         count = element. __getattr__('count')
 
         tup = (element.occupation, count)
